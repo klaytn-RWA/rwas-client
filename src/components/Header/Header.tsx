@@ -1,3 +1,4 @@
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ExchangeFunds } from "@styled-icons/remix-fill";
 import { HandCoin } from "@styled-icons/remix-line";
 import { useEffect, useRef, useState } from "react";
@@ -50,7 +51,9 @@ const Header: React.FC<{}> = () => {
               </a>
             </div>
             {/* Connect wallet */}
-            <div>User</div>
+            <div className="hidden md:flex md:justify-end lg:flex lg:flex-1 lg:justify-end">
+              <ConnectButton />
+            </div>
           </div>
         </div>
       </nav>
