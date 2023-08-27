@@ -53,6 +53,12 @@ dependencies:
   '@styled-icons/material-outlined':
     specifier: ^10.47.0
     version: 10.47.0(react@18.2.0)(styled-components@6.0.4)
+  '@styled-icons/remix-fill':
+    specifier: ^10.46.0
+    version: 10.46.0(react@18.2.0)(styled-components@6.0.4)
+  '@styled-icons/remix-line':
+    specifier: ^10.46.0
+    version: 10.46.0(react@18.2.0)(styled-components@6.0.4)
   '@testing-library/jest-dom':
     specifier: ^5.16.5
     version: 5.16.5
@@ -4089,6 +4095,30 @@ packages:
 
   /@styled-icons/material-outlined@10.47.0(react@18.2.0)(styled-components@6.0.4):
     resolution: {integrity: sha512-/QeDSGXlfRoIsgx4g4Hb//xhsucD4mJJsNPk/e1XzckxkNG+YHCIjbAHzDwxwNfSCJYcTDcOp2SZcoS7iyNGlw==}
+    peerDependencies:
+      react: '*'
+      styled-components: '*'
+    dependencies:
+      '@babel/runtime': 7.22.10
+      '@styled-icons/styled-icon': 10.7.0(react@18.2.0)(styled-components@6.0.4)
+      react: 18.2.0
+      styled-components: 6.0.4(react-dom@18.2.0)(react@18.2.0)
+    dev: false
+
+  /@styled-icons/remix-fill@10.46.0(react@18.2.0)(styled-components@6.0.4):
+    resolution: {integrity: sha512-D2rWGJ9/7BR+3TMvmIoWGASMfyhWT4lTF+we8h9Pya5Ye+69cftvp817DMuaR/6czCugXTrB++HTQX0XJfoBFw==}
+    peerDependencies:
+      react: '*'
+      styled-components: '*'
+    dependencies:
+      '@babel/runtime': 7.22.10
+      '@styled-icons/styled-icon': 10.7.0(react@18.2.0)(styled-components@6.0.4)
+      react: 18.2.0
+      styled-components: 6.0.4(react-dom@18.2.0)(react@18.2.0)
+    dev: false
+
+  /@styled-icons/remix-line@10.46.0(react@18.2.0)(styled-components@6.0.4):
+    resolution: {integrity: sha512-TkbtXdgcuM7VpE/51k8+sxfReFjSQpAFVnjJi8/gxwcTzjdOG7Plkgsaixi2+hiLk/Coj/+67KbntBoSevROsw==}
     peerDependencies:
       react: '*'
       styled-components: '*'

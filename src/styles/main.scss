@@ -1,0 +1,52 @@
+@import "typefaces";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: $primaryFont, system-ui, sans-serif;
+  }
+}
+
+.main-body {
+  --tw-bg-opacity: 1;
+  position: relative;
+  // background-color: rgb(243 244 245 / var(--tw-bg-opacity));
+}
+
+.skyline-dex--input {
+  border-radius: 12px;
+}
+
+.skyline--input-hide-arrows {
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+}
+
+.skyline--input-box-shadow {
+  box-shadow:
+    inset 4px -4px 3px #ffffff,
+    inset 8px -8px 60px -5px #f1e9ec,
+    inset -7px 7px 5px -4px rgba(174, 174, 192, 0.4);
+  box-sizing: border-box;
+  transition: all 0.15s ease-out;
+}
+
+.skyline--account-box-shadow {
+  box-shadow:
+    inset 4px -4px 3px #716e70,
+    inset 8px -8px 60px -5px #ee26ac,
+    inset -7px 7px 5px -4px rgba(174, 174, 192, 0.4);
+  box-sizing: border-box;
+  transition: all 0.15s ease-out;
+}
+
+.popup-background {
+  background: rgba(255, 227, 227, 0.1) !important;
+  backdrop-filter: blur(3px) !important;
+}
