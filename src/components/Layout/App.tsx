@@ -5,9 +5,41 @@ import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 
 import "../../styles/main.scss";
-import Header from "../Header/Header";
 
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import PopupProvider from "../Popup/PopupProvider";
+import Borrow from "./Borrow";
+import Lend from "./Lend";
+import Marketplace from "./Marketplace";
+import NFTServices from "./NFTServices";
 import Portfolio from "./Portfolio";
+
+const router = createBrowserRouter([
+  {
+    children: [
+      {
+        path: "/",
+        element: <Portfolio />,
+      },
+      {
+        path: "/borrow",
+        element: <Borrow />,
+      },
+      {
+        path: "/lend",
+        element: <Lend />,
+      },
+      {
+        path: "/marketplace",
+        element: <Marketplace />,
+      },
+      {
+        path: "/nft-service",
+        element: <NFTServices />,
+      },
+    ],
+  },
+]);
 
 const App: React.FC = () => {
   const { chains, publicClient } = configureChains(
@@ -54,9 +86,13 @@ const App: React.FC = () => {
   return (
     <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider chains={chains}>
-        <Header />
+        <PopupProvider>
+          <RouterProvider router={router} fallbackElement={<></>} />
+          {/* <Header /> */}
+          {/* <Toast /> */}
+          {/* <Router /> */}
+        </PopupProvider>
         {/* Body */}
-        <Portfolio />
       </RainbowKitProvider>
     </WagmiConfig>
   );

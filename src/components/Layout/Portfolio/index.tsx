@@ -1,14 +1,27 @@
-import NFTCard from "../NFT/NFTCard";
-import SearchInput from "../Search/SearchInput";
-
 import { ArrowBack } from "@styled-icons/boxicons-regular";
+import Header from "../../Header/Header";
+import NFTCard from "../../NFT/NFTCard";
+import Popup from "../../Popup/Popup";
+import { usePopups } from "../../Popup/PopupProvider";
+import SearchInput from "../../Search/SearchInput";
+
 const Portfolio: React.FC<{}> = () => {
+  const { addPopup, removeAll } = usePopups();
+
+  const onOpenPopup = () => {
+    addPopup({
+      Component: () => {
+        return <Popup className="bg-white"></Popup>;
+      },
+    });
+  };
   return (
     <>
-      <div className="p-4 md:ml-64 mt-14 bg-gray-100 h-screen">
+      <Header />
+      <div className="p-4 md:ml-64 mt-14 bg-gray-100 h-screen" onClick={() => onOpenPopup()}>
         <h2 className="w-fit bg-white border border-none rounded-xl px-6 py-1 my-4 flex justify-center items-center space-x-2 cursor-pointer">
           <ArrowBack size={24} />
-          <div className="text-[20px] font-bold">Portfolio</div>
+          <div className="text-[18px] font-bold">Portfolio</div>
         </h2>
         <div className="py-2 border border-none rounded-xl my-4 flex space-x-4">
           <div className="flex justify-between items-center space-x-2 w-[300px] bg-white drop-shadow-xl px-4 py-4 border border-none rounded-xl">

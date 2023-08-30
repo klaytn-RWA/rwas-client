@@ -2,10 +2,14 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ExchangeFunds } from "@styled-icons/remix-fill";
 import { HandCoin } from "@styled-icons/remix-line";
 import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+
 import NFT_ICON from "../../../public/icons/card.png";
 const Header: React.FC<{}> = () => {
   const [isOpenMobileMenu, setIsOpenMobileMenu] = useState(false);
   const menuBackgroundService = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
+  const data = useLocation();
 
   const onOpenMobileMenu = () => {
     setIsOpenMobileMenu(!isOpenMobileMenu);
@@ -46,9 +50,14 @@ const Header: React.FC<{}> = () => {
                   />
                 </svg>
               </button>
-              <a href="#" className="flex ml-2 md:mr-24">
+              <div
+                onClick={() => {
+                  navigate("/");
+                }}
+                className="cursor-pointer flex ml-2 md:mr-24"
+              >
                 <img src="/icons/transca-vault-logo.svg" className="h-6 mr-3" alt="Transca vault Logo" />
-              </a>
+              </div>
             </div>
             {/* Connect wallet */}
             <div className="hidden md:flex md:justify-end lg:flex lg:flex-1 lg:justify-end">
@@ -67,7 +76,12 @@ const Header: React.FC<{}> = () => {
         <div className="h-full px-3 pb-4 flex flex-col justify-between overflow-y-auto bg-white dark:bg-gray-800">
           <ul className="space-y-2 font-medium">
             <li>
-              <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <div
+                onClick={() => {
+                  navigate("/");
+                }}
+                className="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+              >
                 <svg
                   className="w-[24px] h-[24px] text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                   aria-hidden="true"
@@ -79,35 +93,55 @@ const Header: React.FC<{}> = () => {
                   <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
                 </svg>
                 <span className="ml-3">Portfolio</span>
-              </a>
+              </div>
             </li>
             <li>
-              <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <div
+                onClick={() => {
+                  navigate("/nft-service");
+                }}
+                className="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+              >
                 <img src={NFT_ICON} className="h-[24px] w-[24px]" />
                 <span className="ml-3">NFTs Service</span>
-              </a>
+              </div>
             </li>
 
             <li>
-              <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <div
+                onClick={() => {
+                  navigate("/borrow");
+                }}
+                className="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+              >
                 <HandCoin size={24} />
-                <span className="flex-1 ml-3 whitespace-nowrap">Your Loans</span>
+                <span className="flex-1 ml-3 whitespace-nowrap">Borrow</span>
                 <span className="inline-flex items-center justify-center w-3 h-3 p-3 ml-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
                   3
                 </span>
-              </a>
+              </div>
             </li>
             <li>
-              <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <div
+                onClick={() => {
+                  navigate("/lend");
+                }}
+                className="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+              >
                 <ExchangeFunds size={24} />
-                <span className="flex-1 ml-3 whitespace-nowrap">Your Funding</span>
+                <span className="flex-1 ml-3 whitespace-nowrap">Lend</span>
                 <span className="inline-flex items-center justify-center w-3 h-3 p-3 ml-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
                   3
                 </span>
-              </a>
+              </div>
             </li>
             <li>
-              <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <div
+                onClick={() => {
+                  navigate("/marketplace");
+                }}
+                className="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+              >
                 <svg
                   className="flex-shrink-0 w-[24px] h-[24px] text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                   aria-hidden="true"
@@ -121,12 +155,17 @@ const Header: React.FC<{}> = () => {
                 <span className="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300">
                   Soon
                 </span>
-              </a>
+              </div>
             </li>
           </ul>
 
           <div className="mx-auto flex flex-col space-y-4 w-full">
-            <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <div
+              onClick={() => {
+                navigate("/");
+              }}
+              className="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            >
               <svg
                 className="flex-shrink-0 w-[24px] h-[24px] text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                 aria-hidden="true"
@@ -140,8 +179,13 @@ const Header: React.FC<{}> = () => {
               <span className="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300">
                 Soon
               </span>
-            </a>
-            <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            </div>
+            <div
+              onClick={() => {
+                navigate("/");
+              }}
+              className="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            >
               <svg
                 className="flex-shrink-0 w-[24px] h-[24px] text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                 aria-hidden="true"
@@ -155,7 +199,7 @@ const Header: React.FC<{}> = () => {
               <span className="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300">
                 Soon
               </span>
-            </a>
+            </div>
             <div className="mx-auto">
               <ConnectButton showBalance={false} />
             </div>
