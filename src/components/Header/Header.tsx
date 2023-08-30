@@ -80,7 +80,9 @@ const Header: React.FC<{}> = () => {
                 onClick={() => {
                   navigate("/");
                 }}
-                className="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
+                  data.pathname === "/" && "bg-gray-100"
+                }`}
               >
                 <svg
                   className="w-[24px] h-[24px] text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -100,7 +102,9 @@ const Header: React.FC<{}> = () => {
                 onClick={() => {
                   navigate("/nft-service");
                 }}
-                className="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
+                  data.pathname === "/nft-service" && "bg-gray-100"
+                }`}
               >
                 <img src={NFT_ICON} className="h-[24px] w-[24px]" />
                 <span className="ml-3">NFTs Service</span>
@@ -112,7 +116,9 @@ const Header: React.FC<{}> = () => {
                 onClick={() => {
                   navigate("/borrow");
                 }}
-                className="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
+                  data.pathname === "/borrow" && "bg-gray-100"
+                }`}
               >
                 <HandCoin size={24} />
                 <span className="flex-1 ml-3 whitespace-nowrap">Borrow</span>
@@ -126,7 +132,9 @@ const Header: React.FC<{}> = () => {
                 onClick={() => {
                   navigate("/lend");
                 }}
-                className="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
+                  data.pathname === "/lend" && "bg-gray-100"
+                }`}
               >
                 <ExchangeFunds size={24} />
                 <span className="flex-1 ml-3 whitespace-nowrap">Lend</span>
@@ -140,7 +148,9 @@ const Header: React.FC<{}> = () => {
                 onClick={() => {
                   navigate("/marketplace");
                 }}
-                className="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
+                  data.pathname === "/marketplace" && "bg-gray-100"
+                }`}
               >
                 <svg
                   className="flex-shrink-0 w-[24px] h-[24px] text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"

@@ -1,4 +1,5 @@
 import { ArrowBack } from "@styled-icons/boxicons-regular";
+import {} from "../../../../public/icons/diamond1.png";
 import Header from "../../Header/Header";
 import NFTCard from "../../NFT/NFTCard";
 import Popup from "../../Popup/Popup";
@@ -6,7 +7,7 @@ import { usePopups } from "../../Popup/PopupProvider";
 import SearchInput from "../../Search/SearchInput";
 
 const Portfolio: React.FC<{}> = () => {
-  const { addPopup, removeAll } = usePopups();
+  const { addPopup } = usePopups();
 
   const onOpenPopup = () => {
     addPopup({
@@ -18,7 +19,7 @@ const Portfolio: React.FC<{}> = () => {
   return (
     <>
       <Header />
-      <div className="p-4 md:ml-64 mt-14 bg-gray-100 h-screen" onClick={() => onOpenPopup()}>
+      <div className="p-4 md:ml-64 mt-14 bg-gray-100 h-screen">
         <h2 className="w-fit bg-white border border-none rounded-xl px-6 py-1 my-4 flex justify-center items-center space-x-2 cursor-pointer">
           <ArrowBack size={24} />
           <div className="text-[18px] font-bold">Portfolio</div>
@@ -73,16 +74,16 @@ const Portfolio: React.FC<{}> = () => {
             </div>
           </div>
           <div className="flex jusitfy-center items-center flex-wrap bg-white my-4 border border-none rounded-xl">
-            <NFTCard nftImg="/nfts/diamond1.png" />
-            <NFTCard nftImg="/nfts/diamond2.png" />
-            <NFTCard nftImg="/nfts/diamond3.png" />
-            <NFTCard nftImg="/nfts/gold1.png" />
-            <NFTCard nftImg="/nfts/gold1.png" />
-            <NFTCard nftImg="/nfts/gold1.png" />
-            <NFTCard nftImg="/nfts/gold1.png" />
-            <NFTCard nftImg="/nfts/gold1.png" />
-            <NFTCard nftImg="/nfts/gold1.png" />
-            <NFTCard nftImg="/nfts/gold1.png" />
+            <NFTCard nftImg="/icons/diamond1.png" />
+            <NFTCard nftImg="/icons/diamond2.png" />
+            <NFTCard nftImg="/icons/diamond3.png" />
+            <NFTCard nftImg="/icons/gold1.png" />
+            <NFTCard nftImg="/icons/gold1.png" />
+            <NFTCard nftImg="/icons/gold1.png" />
+            <NFTCard nftImg="/icons/gold1.png" />
+            <NFTCard nftImg="/icons/gold1.png" />
+            <NFTCard nftImg="/icons/gold1.png" />
+            <NFTCard nftImg="/icons/gold1.png" />
           </div>
         </div>
       </div>
