@@ -10,13 +10,16 @@ const Borrow: React.FC<{}> = () => {
     <div className="">
       <Header />
       <div className="p-4 md:ml-64 mt-14 bg-gray-100">
-        <h2 className="w-fit bg-white border border-none rounded-xl px-6 py-1 my-4 flex justify-center items-center space-x-2 cursor-pointer">
-          <ArrowBack size={24} />
-          <div className="text-[18px] font-bold">Borrow</div>
-        </h2>
-        <div className="mb-2">
-          <Message title="Borrow a fund" content="Assets you own. Pick one for create a borrow request!" />
+        <div className="flex space-x-2 items-center">
+          <h2 className="w-fit bg-white border border-none rounded-xl px-6 py-1 my-4 flex justify-center items-center space-x-2 cursor-pointer">
+            <ArrowBack size={24} />
+            <div className="text-[18px] font-bold">Borrow</div>
+          </h2>
+          <div className="mb-2">
+            <Message title="Borrow a fund" content="Assets you own. Pick one for create a borrow request!" />
+          </div>
         </div>
+
         <div className="flex flex-col lg:flex-row justify-center space-y-4 lg:space-x-4 lg:space-y-0 mt-4">
           <div className="w-full lg:w-2/3">
             <div className="bg-white p-4 mb-4 border border-none rounded-xl flex justify-between items-center space-x-4">
