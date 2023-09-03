@@ -132,7 +132,7 @@ dependencies:
     specifier: ^0.4.3
     version: 0.4.3(eslint@8.47.0)
   ethers:
-    specifier: v5
+    specifier: ^5.0.0
     version: 5.0.0
   joi:
     specifier: ^17.9.2

@@ -53,7 +53,7 @@ const Portfolio: React.FC<{}> = () => {
     let nfts = null;
     if (listNFTs.length > 0) {
       nfts = listNFTs.map((e, i) => {
-        return <NFTCard key={i} nftImg={e._image} />;
+        return <NFTCard key={i} nftData={e} />;
       });
     }
     return nfts;

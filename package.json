@@ -54,7 +54,7 @@
     "eslint": "^8.47.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
-    "ethers": "v5",
+    "ethers": "^5.0.0",
     "joi": "^17.9.2",
     "postcss": "^8.4.26",
     "prettier": "^3.0.2",
