@@ -1,5 +1,9 @@
 import { ArrowBack } from "@styled-icons/boxicons-regular";
+import { readContract } from "@wagmi/core";
+import { useState } from "react";
+import { useAccount, useContractRead } from "wagmi";
 import {} from "../../../../public/icons/diamond1.png";
+import abi from "../../../abi/TranscaAssetNFT.json";
 import Header from "../../Header/Header";
 import NFTCard from "../../NFT/NFTCard";
 import Popup from "../../Popup/Popup";
@@ -7,7 +11,35 @@ import { usePopups } from "../../Popup/PopupProvider";
 import SearchInput from "../../Search/SearchInput";
 
 const Portfolio: React.FC<{}> = () => {
+  const [listNFTs, setListNFTs] = useState<Array<any>>([]);
   const { addPopup } = usePopups();
+  const { address, isConnecting, isDisconnected } = useAccount();
+
+  const {} = useContractRead({
+    address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
+    abi: abi,
+    functionName: "getAllAssetByUser",
+    args: [address],
+    onSuccess: async (data: Array<any>) => {
+      for (let index = 0; index < data.length; index++) {
+        const uri = await readContract({
+          address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
+          abi: abi,
+          functionName: "tokenURI",
+          args: [data[index]._assetId],
+        });
+        if (uri) {
+          const response = await fetch(uri as string).then((response) => response.json());
+          if (response) {
+            data[index]._image = response.image;
+          }
+        }
+      }
+      setListNFTs(data);
+    },
+  });
+
+  // tokenURI
 
   const onOpenPopup = () => {
     addPopup({
@@ -16,6 +48,17 @@ const Portfolio: React.FC<{}> = () => {
       },
     });
   };
+
+  const onShowNFTs = () => {
+    let nfts = null;
+    if (listNFTs.length > 0) {
+      nfts = listNFTs.map((e, i) => {
+        return <NFTCard key={i} nftImg={e._image} />;
+      });
+    }
+    return nfts;
+  };
+
   return (
     <>
       <Header />
@@ -74,7 +117,7 @@ const Portfolio: React.FC<{}> = () => {
             </div>
           </div>
           <div className="flex jusitfy-center items-center flex-wrap bg-white my-4 border border-none rounded-xl">
-            <NFTCard nftImg="/icons/diamond1.png" />
+            {/* <NFTCard nftImg="/icons/diamond1.png" />
             <NFTCard nftImg="/icons/diamond2.png" />
             <NFTCard nftImg="/icons/diamond3.png" />
             <NFTCard nftImg="/icons/gold1.png" />
@@ -83,7 +126,8 @@ const Portfolio: React.FC<{}> = () => {
             <NFTCard nftImg="/icons/gold1.png" />
             <NFTCard nftImg="/icons/gold1.png" />
             <NFTCard nftImg="/icons/gold1.png" />
-            <NFTCard nftImg="/icons/gold1.png" />
+            <NFTCard nftImg="/icons/gold1.png" /> */}
+            {onShowNFTs()}
           </div>
         </div>
       </div>
