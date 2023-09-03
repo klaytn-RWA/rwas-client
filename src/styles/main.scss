@@ -107,3 +107,37 @@
   align-items: center;
   gap: 80px;
 }
+
+.transca--input {
+  border-radius: 12px;
+}
+
+.color-light {
+  color: #09090a;
+}
+
+.color-light-input {
+  background-color: #ffffff;
+}
+
+.color-light-placeholder {
+  &::placeholder {
+    color: #d2d6d9;
+  }
+}
+
+.color-light-border {
+  border-color: #d8dcdf;
+}
+
+.color-light-input-error {
+  border: 1px solid #ff3a46;
+}
+
+.transca--input-hide-arrows {
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+}

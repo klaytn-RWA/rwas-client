@@ -16,7 +16,7 @@ const Borrow: React.FC<{}> = () => {
             <div className="text-[18px] font-bold">Borrow</div>
           </h2>
           <div className="mb-2">
-            <Message title="Borrow a fund" content="Assets you own. Pick one for create a borrow request!" />
+            <Message className="bg-blue-100 border-blue-500" title="Borrow a fund" content="Assets you own. Pick one for create a borrow request!" />
           </div>
         </div>
 
