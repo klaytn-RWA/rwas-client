@@ -1,7 +1,7 @@
 import * as ethers from "ethers";
 
 const NFTCard: React.FC<{ nftData: any }> = ({ nftData }) => {
-  console.log("7s200:nft", nftData);
+  // console.log("7s200:nft", nftData);
   return (
     <div className="nft-body">
       <div className="nft-container">

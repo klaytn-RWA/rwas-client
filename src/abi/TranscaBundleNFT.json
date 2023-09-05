@@ -1,10 +1,5 @@
 [
   {
-    "inputs": [],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
     "anonymous": false,
     "inputs": [
       {
@@ -103,21 +98,9 @@
       },
       {
         "indexed": false,
-        "internalType": "int256",
-        "name": "_weight",
-        "type": "int256"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "_indentifierCode",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint16",
-        "name": "_assestType",
-        "type": "uint16"
+        "internalType": "uint256[]",
+        "name": "_ids",
+        "type": "uint256[]"
       }
     ],
     "name": "Issue",
@@ -134,94 +117,6 @@
       }
     ],
     "name": "MetadataUpdate",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "Paused",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "previousAdminRole",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "newAdminRole",
-        "type": "bytes32"
-      }
-    ],
-    "name": "RoleAdminChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      }
-    ],
-    "name": "RoleGranted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      }
-    ],
-    "name": "RoleRevoked",
     "type": "event"
   },
   {
@@ -250,58 +145,6 @@
     "type": "event"
   },
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "Unpaused",
-    "type": "event"
-  },
-  {
-    "inputs": [],
-    "name": "DEFAULT_ADMIN_ROLE",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "MINTER_ROLE",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "PAUSER_ROLE",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -317,60 +160,6 @@
     "name": "approve",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "assets",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "_assetId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "int256",
-        "name": "_weight",
-        "type": "int256"
-      },
-      {
-        "internalType": "string",
-        "name": "_indentifierCode",
-        "type": "string"
-      },
-      {
-        "internalType": "uint16",
-        "name": "_assetType",
-        "type": "uint16"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_startTime",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_expireTime",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_userDefinePrice",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_appraisalPrice",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -408,67 +197,51 @@
   {
     "inputs": [
       {
+        "internalType": "uint256[]",
+        "name": "_nftIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      }
+    ],
+    "name": "deposit",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
-        "name": "userAddress",
+        "name": "_in_address",
         "type": "address"
       }
     ],
-    "name": "getAllAssetByUser",
+    "name": "getAllBunelByOwner",
     "outputs": [
       {
         "components": [
           {
-            "internalType": "address",
-            "name": "_owner",
-            "type": "address"
-          },
-          {
             "internalType": "uint256",
-            "name": "_assetId",
+            "name": "_bundleId",
             "type": "uint256"
           },
           {
-            "internalType": "int256",
-            "name": "_weight",
-            "type": "int256"
-          },
-          {
-            "internalType": "string",
-            "name": "_indentifierCode",
-            "type": "string"
-          },
-          {
-            "internalType": "uint16",
-            "name": "_assetType",
-            "type": "uint16"
-          },
-          {
-            "internalType": "uint256",
-            "name": "_startTime",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "_expireTime",
-            "type": "uint256"
-          },
-          {
-            "internalType": "int256",
-            "name": "_oraklPrice",
-            "type": "int256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "_userDefinePrice",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "_appraisalPrice",
-            "type": "uint256"
+            "internalType": "uint256[]",
+            "name": "_assetIds",
+            "type": "uint256[]"
           }
         ],
-        "internalType": "struct ITransca.AssetR[]",
+        "internalType": "struct TranscaBundleNFT.TranscaBundle[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -499,11 +272,11 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_in_asset_id",
+        "name": "_id",
         "type": "uint256"
       }
     ],
-    "name": "getAssetDetail",
+    "name": "getAssetAttribute",
     "outputs": [
       {
         "components": [
@@ -570,56 +343,26 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_in_asset_id",
+        "name": "_in_bundle_id",
         "type": "uint256"
       }
     ],
-    "name": "getAssetDetailNonOracle",
+    "name": "getBundle",
     "outputs": [
       {
         "components": [
           {
             "internalType": "uint256",
-            "name": "_assetId",
+            "name": "_bundleId",
             "type": "uint256"
           },
           {
-            "internalType": "int256",
-            "name": "_weight",
-            "type": "int256"
-          },
-          {
-            "internalType": "string",
-            "name": "_indentifierCode",
-            "type": "string"
-          },
-          {
-            "internalType": "uint16",
-            "name": "_assetType",
-            "type": "uint16"
-          },
-          {
-            "internalType": "uint256",
-            "name": "_startTime",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "_expireTime",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "_userDefinePrice",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "_appraisalPrice",
-            "type": "uint256"
+            "internalType": "uint256[]",
+            "name": "_assetIds",
+            "type": "uint256[]"
           }
         ],
-        "internalType": "struct ITransca.Asset",
+        "internalType": "struct TranscaBundleNFT.TranscaBundle",
         "name": "",
         "type": "tuple"
       }
@@ -628,74 +371,19 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "getLatestData",
-    "outputs": [
-      {
-        "internalType": "int256",
-        "name": "",
-        "type": "int256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
+        "internalType": "uint256",
+        "name": "_in_bundle_id",
+        "type": "uint256"
       }
     ],
-    "name": "getRoleAdmin",
+    "name": "getOwner",
     "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
       {
         "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "grantRole",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "hasRole",
-    "outputs": [
-      {
-        "internalType": "bool",
         "name": "",
-        "type": "bool"
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -748,8 +436,42 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "_in_id",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "name": "onERC721Received",
+    "outputs": [
+      {
+        "internalType": "bytes4",
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
         "type": "uint256"
       }
     ],
@@ -762,170 +484,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "pause",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "paused",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "physicalAssetAttribute",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "_assetId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "int256",
-        "name": "_weight",
-        "type": "int256"
-      },
-      {
-        "internalType": "string",
-        "name": "_indentifierCode",
-        "type": "string"
-      },
-      {
-        "internalType": "uint16",
-        "name": "_assetType",
-        "type": "uint16"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_startTime",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_expireTime",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_userDefinePrice",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_appraisalPrice",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "renounceRole",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "revokeRole",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_to",
-        "type": "address"
-      },
-      {
-        "internalType": "int256",
-        "name": "_in_weight",
-        "type": "int256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_in_expire_time",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint16",
-        "name": "_in_assetType",
-        "type": "uint16"
-      },
-      {
-        "internalType": "string",
-        "name": "_in_identifierCode",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_in_token_uri",
-        "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_in_user_define_price",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "in_appraisal_price",
-        "type": "uint256"
-      }
-    ],
-    "name": "safeMint",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -970,7 +528,7 @@
       },
       {
         "internalType": "bytes",
-        "name": "_data",
+        "name": "data",
         "type": "bytes"
       }
     ],
@@ -983,11 +541,11 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "aggregatorProxy",
+        "name": "_address",
         "type": "address"
       }
     ],
-    "name": "setAggregator",
+    "name": "setAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1023,42 +581,12 @@
         "type": "uint256"
       },
       {
-        "internalType": "int256",
-        "name": "_weight",
-        "type": "int256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_startTime",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_expireTime",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "_indentifierCode",
-        "type": "string"
-      },
-      {
-        "internalType": "uint16",
-        "name": "_assetType",
-        "type": "uint16"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_userDefinePrice",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_appraisalPrice",
-        "type": "uint256"
+        "internalType": "uint256[]",
+        "name": "_ids",
+        "type": "uint256[]"
       }
     ],
-    "name": "setAsset",
+    "name": "setBundle",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1173,6 +701,25 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "transcaBundleAttribute",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "_bundleId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "from",
         "type": "address"
@@ -1194,9 +741,21 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "unpause",
-    "outputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_in_bundle_id",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdraw",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   }

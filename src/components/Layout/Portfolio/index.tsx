@@ -3,7 +3,9 @@ import { readContract } from "@wagmi/core";
 import { useState } from "react";
 import { useAccount, useContractRead } from "wagmi";
 import {} from "../../../../public/icons/diamond1.png";
-import abi from "../../../abi/TranscaAssetNFT.json";
+import abiAsset from "../../../abi/TranscaAssetNFT.json";
+import abiBundle from "../../../abi/TranscaBundleNFT.json";
+
 import Header from "../../Header/Header";
 import NFTCard from "../../NFT/NFTCard";
 import Popup from "../../Popup/Popup";
@@ -12,30 +14,65 @@ import SearchInput from "../../Search/SearchInput";
 
 const Portfolio: React.FC<{}> = () => {
   const [listNFTs, setListNFTs] = useState<Array<any>>([]);
+  const [bundles, setBundles] = useState<Array<any>>([]);
   const { addPopup } = usePopups();
   const { address, isConnecting, isDisconnected } = useAccount();
 
   const {} = useContractRead({
     address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
-    abi: abi,
+    abi: abiAsset,
     functionName: "getAllAssetByUser",
     args: [address],
     onSuccess: async (data: Array<any>) => {
       for (let index = 0; index < data.length; index++) {
         const uri = await readContract({
           address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
-          abi: abi,
+          abi: abiAsset,
           functionName: "tokenURI",
           args: [data[index]._assetId],
         });
         if (uri) {
-          const response = await fetch(uri as string).then((response) => response.json());
+          const response = await fetch(uri as string)
+            .then((response) => response.json())
+            .catch(() => {
+              return null;
+            });
           if (response) {
             data[index]._image = response.image;
+          } else {
+            data[index]._image = uri;
           }
         }
       }
       setListNFTs(data);
+    },
+  });
+
+  const {} = useContractRead({
+    address: import.meta.env.VITE_TRANSCA_BUNDLE_NFT_CONTRACT!,
+    abi: abiBundle,
+    functionName: "getAllBunelByOwner",
+    args: [address],
+    onSuccess: async (data: Array<any>) => {
+      if (data.length > 0) {
+        let res: Array<any> = [];
+        for (let index = 0; index < data.length; index++) {
+          let nfts = [];
+          for (let j = 0; j < data[index]._assetIds.length; j++) {
+            const nftData = await readContract({
+              address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
+              abi: abiAsset,
+              functionName: "getAssetDetail",
+              args: [data[index]._assetIds[j]],
+            });
+            if (nftData) {
+              nfts.push(nftData);
+            }
+          }
+          res.push({ [data[index]._bundleId]: nfts });
+        }
+        setBundles(res);
+      }
     },
   });
 
