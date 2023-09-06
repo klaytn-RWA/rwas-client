@@ -107,7 +107,6 @@ const Portfolio: React.FC<{}> = () => {
       }
     },
   });
-  console.log("7s200:bundles", bundles);
 
   // tokenURI
 
@@ -197,16 +196,6 @@ const Portfolio: React.FC<{}> = () => {
             </div>
           </div>
           <div className="flex jusitfy-center items-center flex-wrap bg-white my-4 border border-none rounded-xl">
-            {/* <NFTCard nftImg="/icons/diamond1.png" />
-            <NFTCard nftImg="/icons/diamond2.png" />
-            <NFTCard nftImg="/icons/diamond3.png" />
-            <NFTCard nftImg="/icons/gold1.png" />
-            <NFTCard nftImg="/icons/gold1.png" />
-            <NFTCard nftImg="/icons/gold1.png" />
-            <NFTCard nftImg="/icons/gold1.png" />
-            <NFTCard nftImg="/icons/gold1.png" />
-            <NFTCard nftImg="/icons/gold1.png" />
-            <NFTCard nftImg="/icons/gold1.png" /> */}
             {onShowBundleNFTs()}
             {onShowNFTs()}
           </div>

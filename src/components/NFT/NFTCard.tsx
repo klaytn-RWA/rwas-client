@@ -7,7 +7,14 @@ const NFTCard: React.FC<{ nftData: any }> = ({ nftData }) => {
       <div className="nft-container">
         <div className="card">
           <div className={`nft-front bg-cover bg-center`} style={{ backgroundImage: `url(${nftData._image})` }}>
-            <div className="bg-green-600 text-white text-sm font-bold m-2 w-fit px-2 border border-none rounded-2xl">2500$</div>
+            {Number(ethers.utils.formatUnits(nftData._oraklPrice, 26)) > 0 && (
+              <div className="bg-green-600 text-white text-sm font-bold m-2 w-fit px-2 border border-none rounded-2xl">
+                {Number(ethers.utils.formatUnits(nftData._oraklPrice, 26)).toFixed(2)} $
+              </div>
+            )}
+            {Number(nftData._appraisalPrice) > 0 && (
+              <div className="bg-blue-600 text-white text-sm font-bold m-2 w-fit px-2 border border-none rounded-2xl">{Number(nftData._appraisalPrice).toFixed(2)} $</div>
+            )}
           </div>
           <div className="nft-back text-[12px]">
             <div>
