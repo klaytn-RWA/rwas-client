@@ -9,7 +9,6 @@ import abiBundle from "../../../abi/TranscaBundleNFT.json";
 import Header from "../../Header/Header";
 import BundleNFT from "../../NFT/BundleNFT";
 import NFTCard from "../../NFT/NFTCard";
-import Popup from "../../Popup/Popup";
 import { usePopups } from "../../Popup/PopupProvider";
 import SearchInput from "../../Search/SearchInput";
 
@@ -109,14 +108,6 @@ const Portfolio: React.FC<{}> = () => {
   });
 
   // tokenURI
-
-  const onOpenPopup = () => {
-    addPopup({
-      Component: () => {
-        return <Popup className="bg-white"></Popup>;
-      },
-    });
-  };
 
   const onShowNFTs = () => {
     let nfts = null;
