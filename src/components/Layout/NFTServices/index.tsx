@@ -1,5 +1,7 @@
 import { ArrowBack } from "@styled-icons/boxicons-regular";
 import Header from "../../Header/Header";
+import BundleService from "./BundleService";
+import SplitService from "./SplitService";
 
 const NFTService: React.FC<{}> = () => {
   return (
@@ -10,6 +12,12 @@ const NFTService: React.FC<{}> = () => {
           <ArrowBack size={24} />
           <div className="text-[18px] font-bold">NFT Services</div>
         </h2>
+
+        <div className="flex flex-col lg:flex-row justify-between space-y-6 lg:space-y-0 lg:space-x-6 my-4 border border-none rounded-xl">
+          <BundleService />
+
+          <SplitService />
+        </div>
       </div>
     </>
   );

@@ -200,11 +200,6 @@
         "internalType": "uint256[]",
         "name": "_nftIds",
         "type": "uint256[]"
-      },
-      {
-        "internalType": "bytes",
-        "name": "signature",
-        "type": "bytes"
       }
     ],
     "name": "deposit",
