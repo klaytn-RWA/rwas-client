@@ -7,6 +7,7 @@ import abiAsset from "../../../abi/TranscaAssetNFT.json";
 import abiBundle from "../../../abi/TranscaBundleNFT.json";
 
 import Header from "../../Header/Header";
+import BundleNFT from "../../NFT/BundleNFT";
 import NFTCard from "../../NFT/NFTCard";
 import Popup from "../../Popup/Popup";
 import { usePopups } from "../../Popup/PopupProvider";
@@ -58,6 +59,18 @@ const Portfolio: React.FC<{}> = () => {
         let res: Array<any> = [];
         for (let index = 0; index < data.length; index++) {
           let nfts = [];
+          const uri = await readContract({
+            address: import.meta.env.VITE_TRANSCA_BUNDLE_NFT_CONTRACT!,
+            abi: abiAsset,
+            functionName: "tokenURI",
+            args: [data[index]._bundleId],
+          });
+          const resImg = await fetch(uri as string)
+            .then((response) => response.json())
+            .catch(() => {
+              return null;
+            });
+
           for (let j = 0; j < data[index]._assetIds.length; j++) {
             const nftData = await readContract({
               address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
@@ -65,16 +78,36 @@ const Portfolio: React.FC<{}> = () => {
               functionName: "getAssetDetail",
               args: [data[index]._assetIds[j]],
             });
+
+            let temp: any = nftData;
+            const uri = await readContract({
+              address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
+              abi: abiAsset,
+              functionName: "tokenURI",
+              args: [data[index]._assetIds[j]],
+            });
+            if (uri) {
+              await fetch(uri as string)
+                .then(async (response) => {
+                  const a = await response.json();
+                  temp._image = a.image;
+                })
+                .catch(() => {
+                  temp._image = uri;
+                  return null;
+                });
+            }
             if (nftData) {
-              nfts.push(nftData);
+              nfts.push(temp);
             }
           }
-          res.push({ [data[index]._bundleId]: nfts });
+          res.push({ id: data[index]._bundleId, nfts: nfts, uri: resImg ? resImg.image : "" });
         }
         setBundles(res);
       }
     },
   });
+  console.log("7s200:bundles", bundles);
 
   // tokenURI
 
@@ -94,6 +127,16 @@ const Portfolio: React.FC<{}> = () => {
       });
     }
     return nfts;
+  };
+
+  const onShowBundleNFTs = () => {
+    let temp = null;
+    if (bundles.length > 0) {
+      temp = bundles.map((e, i) => {
+        return <BundleNFT bundle={e} key={i} />;
+      });
+    }
+    return temp;
   };
 
   return (
@@ -164,6 +207,7 @@ const Portfolio: React.FC<{}> = () => {
             <NFTCard nftImg="/icons/gold1.png" />
             <NFTCard nftImg="/icons/gold1.png" />
             <NFTCard nftImg="/icons/gold1.png" /> */}
+            {onShowBundleNFTs()}
             {onShowNFTs()}
           </div>
         </div>
