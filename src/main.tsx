@@ -1,19 +1,22 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { Provider } from "react-redux";
 import App from "./components/Layout/App";
+import { store } from "./redux/store";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
   <React.StrictMode>
-    {/* <Provider store={store}> */}
-    {/* <Provider store={store}>
+    <Provider store={store}>
+      {/* <Provider store={store}> */}
+      {/* <Provider store={store}>
       <div className="main-body">
         <Router />
         <Toaster />
       </div>
     </Provider> */}
-    <App />
-    {/* </Provider> */}
+      <App />
+    </Provider>
   </React.StrictMode>,
 );
 

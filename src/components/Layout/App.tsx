@@ -8,6 +8,7 @@ import "../../styles/main.scss";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import PopupProvider from "../Popup/PopupProvider";
+import Toast from "../Toast/toast";
 import Borrow from "./Borrow";
 import Lend from "./Lend";
 import Marketplace from "./Marketplace";
@@ -89,7 +90,7 @@ const App: React.FC = () => {
         <PopupProvider>
           <RouterProvider router={router} fallbackElement={<></>} />
           {/* <Header /> */}
-          {/* <Toast /> */}
+          <Toast />
           {/* <Router /> */}
         </PopupProvider>
         {/* Body */}
