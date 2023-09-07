@@ -16,7 +16,7 @@ const BundleService: React.FC = () => {
     addPopup({
       Component: () => {
         const [listNFTs, setListNFTs] = useState<Array<any>>([]);
-        const {} = useContractRead({
+        const { isLoading } = useContractRead({
           address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
           abi: abiAsset,
           functionName: "getAllAssetByUser",
@@ -46,7 +46,7 @@ const BundleService: React.FC = () => {
           },
         });
 
-        return <PopupCreateBundle nfts={listNFTs} />;
+        return <PopupCreateBundle nfts={listNFTs} loadingData={isLoading} />;
       },
     });
   };
@@ -55,7 +55,7 @@ const BundleService: React.FC = () => {
     addPopup({
       Component: () => {
         const [bundles, setBundles] = useState<Array<any>>([]);
-        const {} = useContractRead({
+        const { isLoading } = useContractRead({
           address: import.meta.env.VITE_TRANSCA_BUNDLE_NFT_CONTRACT!,
           abi: abiBundle,
           functionName: "getAllBunelByOwner",
@@ -113,7 +113,7 @@ const BundleService: React.FC = () => {
             }
           },
         });
-        return <PopupUnpackBundle bundles={bundles} />;
+        return <PopupUnpackBundle bundles={bundles} loadingData={isLoading} />;
       },
     });
   };

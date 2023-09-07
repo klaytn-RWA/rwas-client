@@ -2,12 +2,19 @@ import { CheckCircleFill } from "@styled-icons/bootstrap";
 import { writeContract } from "@wagmi/core";
 import React, { useState } from "react";
 import abiBundle from "../../abi/TranscaBundleNFT.json";
+import { setToast } from "../../redux/reducers/toastReducer";
+import { useAppDispatch } from "../../redux/store";
 import Button from "../Button/Button";
 import Popup from "./Popup";
+import { usePopups } from "./PopupProvider";
 
-const PopupUnpackBundle: React.FC<{ bundles: Array<any> }> = ({ bundles }) => {
+const PopupUnpackBundle: React.FC<{ bundles: Array<any>; loadingData: boolean }> = ({ bundles, loadingData }) => {
   const [activeBundle, setActiveBundle] = useState<Number | null>(null);
   const [unPacking, setUnpacking] = useState(false);
+
+  const dispatch = useAppDispatch();
+  const { removeAll } = usePopups();
+
   const onSelectBundle = (bundleId: Number) => {
     if (bundleId === activeBundle) {
       setActiveBundle(null);
@@ -16,6 +23,7 @@ const PopupUnpackBundle: React.FC<{ bundles: Array<any> }> = ({ bundles }) => {
     }
     return;
   };
+
   const onShowNFTs = (nfts: Array<any>) => {
     let temp = null;
     if (nfts.length > 0) {
@@ -25,6 +33,7 @@ const PopupUnpackBundle: React.FC<{ bundles: Array<any> }> = ({ bundles }) => {
     }
     return temp;
   };
+
   const onShowBundleNFTs = () => {
     let temp = null;
     if (bundles.length > 0) {
@@ -43,21 +52,48 @@ const PopupUnpackBundle: React.FC<{ bundles: Array<any> }> = ({ bundles }) => {
     }
     return temp;
   };
+
   const onHanleUnpacking = async () => {
     setUnpacking(true);
     if (activeBundle === null) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please select Bundle to UNPACK",
+          type: "info",
+        }),
+      );
       setUnpacking(false);
       return;
     }
-    try {
-      const write = await writeContract({
-        address: import.meta.env.VITE_TRANSCA_BUNDLE_NFT_CONTRACT! as any,
-        abi: abiBundle,
-        functionName: "withdraw",
-        args: [activeBundle],
-      });
-      console.log("7s200:write", write);
-    } catch (error: any) {
+    const write = await writeContract({
+      address: import.meta.env.VITE_TRANSCA_BUNDLE_NFT_CONTRACT! as any,
+      abi: abiBundle,
+      functionName: "withdraw",
+      args: [activeBundle],
+    });
+    if (write.hash) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Unpack bundle success!",
+          type: "success",
+        }),
+      );
+      setUnpacking(false);
+      removeAll();
+      return;
+    } else {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Something wrong!",
+          type: "error",
+        }),
+      );
       setUnpacking(false);
       return;
     }
@@ -92,7 +128,7 @@ const PopupUnpackBundle: React.FC<{ bundles: Array<any> }> = ({ bundles }) => {
         >
           Unpack Bundle
         </Button>
-        <Button className="!rounded-3xl text-black font-bold text-white min-w-[200px] leading-[21px]" type="reset">
+        <Button className="!rounded-3xl text-black font-bold text-white min-w-[200px] leading-[21px]" type="reset" onClick={() => removeAll()}>
           Cancel
         </Button>
       </div>

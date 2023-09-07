@@ -4,14 +4,19 @@ import { ethers } from "ethers";
 import React, { useState } from "react";
 import { useAccount, useWaitForTransaction } from "wagmi";
 import abiBundle from "../../abi/TranscaBundleNFT.json";
+import { setToast } from "../../redux/reducers/toastReducer";
+import { useAppDispatch } from "../../redux/store";
 import Button from "../Button/Button";
 import Popup from "./Popup";
+import { usePopups } from "./PopupProvider";
 
-const PopupCreateBundle: React.FC<{ nfts: Array<any> }> = ({ nfts }) => {
+const PopupCreateBundle: React.FC<{ nfts: Array<any>; loadingData: boolean }> = ({ nfts, loadingData }) => {
   const [acitves, setActives] = useState<Array<any>>([]);
   const [minting, setMinting] = useState(false);
   const [sig, setSig] = useState("");
   const { address } = useAccount();
+  const { removeAll } = usePopups();
+  const dispatch = useAppDispatch();
 
   const onSelectNFT = (id: number) => {
     const ac = acitves!.filter((res) => id === res);
@@ -22,9 +27,7 @@ const PopupCreateBundle: React.FC<{ nfts: Array<any> }> = ({ nfts }) => {
       setActives(temp);
     }
   };
-  //   useEffect(() => {
-  //     onSelect(acitves);
-  //   }, [acitves]);
+
   const checkActive = (id: number) => {
     const ac = acitves!.filter((res) => id === res);
     if (ac.length > 0) {
@@ -70,15 +73,49 @@ const PopupCreateBundle: React.FC<{ nfts: Array<any> }> = ({ nfts }) => {
 
   const onHandleMintBundle = async () => {
     setMinting(true);
+    if (acitves.length === 0) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please select NFT to mint a bundle",
+          type: "info",
+        }),
+      );
+      setMinting(false);
+      return;
+    }
     const write = await writeContract({
       address: import.meta.env.VITE_TRANSCA_BUNDLE_NFT_CONTRACT! as any,
       abi: abiBundle,
       functionName: "deposit",
       args: [acitves],
     });
-    console.log("7s200:write", write);
+    if (write.hash) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Mint bundle success!",
+          type: "success",
+        }),
+      );
+      setMinting(false);
+      removeAll();
+      return;
+    } else {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Something wrong!",
+          type: "error",
+        }),
+      );
+      setMinting(false);
+      return;
+    }
   };
-  console.log("7s200:txn:", txData);
 
   return (
     <Popup className="bg-gray-50 min-w-[1000px]">
