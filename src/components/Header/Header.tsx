@@ -146,6 +146,19 @@ const Header: React.FC<{}> = () => {
             <li>
               <div
                 onClick={() => {
+                  navigate("/history");
+                }}
+                className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
+                  data.pathname === "/history" && "bg-gray-100"
+                }`}
+              >
+                <img src={NFT_ICON} className="h-[24px] w-[24px]" />
+                <span className="ml-3">History</span>
+              </div>
+            </li>
+            <li>
+              <div
+                onClick={() => {
                   navigate("/marketplace");
                 }}
                 className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${

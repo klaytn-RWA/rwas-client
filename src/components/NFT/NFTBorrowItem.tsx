@@ -1,6 +1,7 @@
 import { writeContract } from "@wagmi/core";
 import { ethers } from "ethers";
 import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useAccount } from "wagmi";
 import abiIntermadiation from "../../abi/TranscaIntermediation.json";
 import { Asset, getAssets } from "../../redux/reducers/assetReducer";
@@ -8,14 +9,20 @@ import { Bundle, getBundles } from "../../redux/reducers/bundleReducer";
 import { setToast } from "../../redux/reducers/toastReducer";
 import { useAppDispatch } from "../../redux/store";
 import cn from "../../services/cn";
+import { resolverError } from "../../utils/form";
 import Button from "../Button/Button";
 import Input from "../Input/Input";
 import Popup from "../Popup/Popup";
 import { usePopups } from "../Popup/PopupProvider";
 import KanaSelectDropdown, { COINS_DATA } from "../Selector/RadixSelector";
 import NFTProperty from "./NFTProperty";
+type BrrowType = {
+  loanAmount: string;
+  minLoanAmount: string;
+  duration: string;
+};
 
-const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) => {
+const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) => {
   const { addPopup } = usePopups();
   console.log("7s200asset", asset);
   let totalOraklPrice = 0;
@@ -23,7 +30,6 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
   let indentifierCode = "";
   let appraisalPrice = 0;
   let id = 0;
-  let userDefinePrice = 0;
   let weight = 0;
   let isQuickRaise = false;
   let contract = "";
@@ -62,13 +68,83 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
         const { removeAll } = usePopups();
         const dispatch = useAppDispatch();
 
-        const onHandleCreateBorrowReq = async () => {
+        const {
+          register,
+          handleSubmit,
+          setValue,
+          watch,
+          formState: { errors },
+        } = useForm<BrrowType>({
+          mode: "onChange",
+          reValidateMode: "onChange",
+          shouldFocusError: true,
+          shouldUnregister: false,
+          resolver: async (values) => {
+            let errors = {};
+
+            if (!values.loanAmount) {
+              errors = { ...errors, ...resolverError("loanAmount", "required", "Amount is required") };
+
+              return { values, errors };
+            }
+
+            if (Number.isNaN(Number(values.loanAmount))) {
+              errors = { ...errors, ...resolverError("loanAmount", "required", "Amount must be a number") };
+
+              return { values, errors };
+            }
+
+            if (Number(values.loanAmount) < 0) {
+              errors = { ...errors, ...resolverError("loanAmount", "required", "Amount must be more than 0") };
+            }
+
+            if (!values.minLoanAmount) {
+              errors = { ...errors, ...resolverError("minLoanAmount", "required", "Amount is required") };
+
+              return { values, errors };
+            }
+
+            if (Number.isNaN(Number(values.minLoanAmount))) {
+              errors = { ...errors, ...resolverError("minLoanAmount", "required", "Amount must be a number") };
+
+              return { values, errors };
+            }
+
+            if (Number(values.minLoanAmount) < 0) {
+              errors = { ...errors, ...resolverError("minLoanAmount", "required", "Amount must be more than 0") };
+            }
+
+            if (!values.duration) {
+              errors = { ...errors, ...resolverError("duration", "required", "Amount is required") };
+
+              return { values, errors };
+            }
+
+            if (Number.isNaN(Number(values.duration))) {
+              errors = { ...errors, ...resolverError("duration", "required", "Amount must be a number") };
+
+              return { values, errors };
+            }
+
+            if (Number(values.duration) < 0) {
+              errors = { ...errors, ...resolverError("duration", "required", "Amount must be more than 0") };
+            }
+
+            return { values, errors };
+          },
+        });
+
+        const onSubmit: SubmitHandler<BrrowType> = async (data) => {
+          await onHandleCreateBorrowReq(data);
+        };
+
+        const onHandleCreateBorrowReq = async (data: BrrowType) => {
           setLoadingCreateBorrow(true);
           const createBorrowReq = await writeContract({
             address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT! as any,
             abi: abiIntermadiation,
             functionName: "createBorrow",
-            args: [id, contract, ethers.utils.parseUnits("1000000", 18), ethers.utils.parseUnits("800000", 18), ethers.BigNumber.from(10 * 60)],
+            args: [id, contract, ethers.utils.parseUnits(data.loanAmount, 18), ethers.utils.parseUnits(data.minLoanAmount, 18), ethers.BigNumber.from(data.duration)],
           });
           if (createBorrowReq.hash) {
             dispatch(
@@ -133,7 +209,7 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
         return (
           <Popup className="bg-gray-50 min-w-[800px] min-h-[700px]">
             <h1 className="mb-4 text-center font-bold text-[20px]">Create Borrow</h1>
-            <div className="flex justify-center  space-x-2">
+            <form onSubmit={handleSubmit(onSubmit)} className="flex justify-center  space-x-2">
               <div className="h-full w-1/2 shadow-xl border border-none rounded-xl p-2 bg-white">
                 <div className="">
                   <div>
@@ -175,7 +251,7 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
                         )}
                         placeholder="0.00"
                         autoComplete="off"
-                        name={""}
+                        {...register("loanAmount", { required: { value: true, message: "Please fill loanAmount" } })}
                       />
                     </div>
 
@@ -189,6 +265,7 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
                       />
                     </div>
                   </div>
+                  <div className="text-red-500">{errors.loanAmount?.message}</div>
                 </div>
                 {/* Loan Interest */}
                 <div className="py-4">
@@ -204,7 +281,7 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
                         )}
                         placeholder="0.00"
                         autoComplete="off"
-                        name={""}
+                        {...register("minLoanAmount", { required: { value: true, message: "Please fill min loan amount" } })}
                       />
                     </div>
 
@@ -218,6 +295,7 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
                       />
                     </div>
                   </div>
+                  <div className="text-red-500">{errors.minLoanAmount?.message}</div>
                 </div>
                 {/* Loan Duration */}
                 <div className="py-4">
@@ -232,16 +310,18 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
                         )}
                         placeholder="0.00"
                         autoComplete="off"
-                        name={""}
+                        {...register("duration", { required: { value: true, message: "Please fill duration" } })}
                       />
                     </div>
                   </div>
+                  <div className="text-red-500">{errors.duration?.message}</div>
                 </div>
                 <div className="flex flex-col justify-center items-center space-y-2 my-8">
                   <Button
                     className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white w-[300px] leading-[21px]"
-                    onClick={() => onHandleCreateBorrowReq()}
+                    // onClick={() => onHandleCreateBorrowReq()}
                     loading={loadingCreateBorrow}
+                    type="submit"
                   >
                     Create Borrow Request
                   </Button>
@@ -256,7 +336,7 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
                   )}
                 </div>
               </div>
-            </div>
+            </form>
           </Popup>
         );
       },
@@ -295,4 +375,4 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
     </div>
   );
 };
-export default NFT;
+export default NFTBorrowItem;

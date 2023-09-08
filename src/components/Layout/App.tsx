@@ -10,6 +10,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import PopupProvider from "../Popup/PopupProvider";
 import Toast from "../Toast/toast";
 import Borrow from "./Borrow";
+import History from "./History/History";
 import Lend from "./Lend";
 import Marketplace from "./Marketplace";
 import NFTServices from "./NFTServices";
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
       {
         path: "/lend",
         element: <Lend />,
+      },
+      {
+        path: "/history",
+        element: <History />,
       },
       {
         path: "/marketplace",

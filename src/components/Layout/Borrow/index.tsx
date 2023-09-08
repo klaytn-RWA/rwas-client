@@ -6,9 +6,9 @@ import { getBundles, selectBundle } from "../../../redux/reducers/bundleReducer"
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import Header from "../../Header/Header";
 import Message from "../../Message/Message";
-import NFT from "../../NFT/NFT";
+import NFTBorrowItem from "../../NFT/NFTBorrowItem";
 import SearchInput from "../../Search/SearchInput";
-import BorrowHistory from "./BorrowHistory";
+import BorrowHistory from "../History/BorrowHistory";
 
 const Borrow: React.FC<{}> = () => {
   const dispatch = useAppDispatch();
@@ -28,7 +28,7 @@ const Borrow: React.FC<{}> = () => {
     let nfts = null;
     if (assetRx.assets.length > 0 && !assetRx.loading) {
       nfts = assetRx.assets.map((e, i) => {
-        return <NFT key={i} asset={e} />;
+        return <NFTBorrowItem key={i} asset={e} />;
       });
     }
     return nfts;
@@ -38,7 +38,7 @@ const Borrow: React.FC<{}> = () => {
     let temp = null;
     if (bundleRx.bundles.length > 0 && !bundleRx.loading) {
       temp = bundleRx.bundles.map((e, i) => {
-        return <NFT key={i} bundle={e} />;
+        return <NFTBorrowItem key={i} bundle={e} />;
       });
     }
     return temp;
@@ -47,7 +47,7 @@ const Borrow: React.FC<{}> = () => {
   return (
     <div className="">
       <Header />
-      <div className="p-4 md:ml-64 mt-14 bg-gray-100">
+      <div className="p-4 md:ml-64 mt-14 bg-gray-100 h-screen">
         <div className="flex space-x-2 items-center">
           <h2 className="w-fit bg-white border border-none rounded-xl px-6 py-1 my-4 flex justify-center items-center space-x-2 cursor-pointer">
             <ArrowBack size={24} />

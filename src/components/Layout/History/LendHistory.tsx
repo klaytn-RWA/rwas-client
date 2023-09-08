@@ -3,8 +3,7 @@ import { useAccount } from "wagmi";
 import { getBorrowReqs, selectIntermediation } from "../../../redux/reducers/intermediationReducer";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import HistoryItem from "./HistoryItem";
-
-const BorrowHistory: React.FC<{}> = () => {
+const LendHistory: React.FC<{}> = () => {
   const dispatch = useAppDispatch();
   const intermediationRx = useAppSelector(selectIntermediation);
   const { address } = useAccount();
@@ -14,19 +13,23 @@ const BorrowHistory: React.FC<{}> = () => {
   }, []);
 
   const onShowHistory = () => {
-    let histories = null;
+    let histories: Array<any> = [];
     if (intermediationRx.allBorrowReqs.length > 0 && !intermediationRx.loading) {
-      histories = intermediationRx.allBorrowReqs.map((e, i) => {
-        console.log("7s200:e", e);
-        if (e.creator === address) {
-          return <HistoryItem key={i} data={e} />;
+      intermediationRx.allBorrowReqs.forEach((e, i) => {
+        if (e.lender === address) {
+          histories.push(<HistoryItem key={i} data={e} actionType="LEND" />);
         }
       });
     }
-    return histories;
+    if (histories.length > 0) {
+      return histories;
+    }
+    return <>Empty</>;
   };
+
+  console.log("7s2002:empty", onShowHistory());
 
   return <div className="flex flex-col space-y-2 overflow-auto py-2 max-h-[650px] scroll-smooth">{onShowHistory()}</div>;
 };
 
-export default BorrowHistory;
+export default LendHistory;
