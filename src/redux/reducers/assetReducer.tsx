@@ -61,6 +61,38 @@ export const getAssets = createAsyncThunk("asset/get", async ({ address }: { add
   }
 });
 
+export const getAssetDetail = createAsyncThunk("asset/detail", async ({ id, cb }: { id: number; cb: (data: Asset) => void }) => {
+  try {
+    const nftData = await readContract({
+      address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
+      abi: abiAsset,
+      functionName: "getAssetDetail",
+      args: [id],
+    });
+
+    let temp: any = nftData;
+    const uri = await readContract({
+      address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
+      abi: abiAsset,
+      functionName: "tokenURI",
+      args: [id],
+    });
+
+    if (uri) {
+      await fetch(uri as string)
+        .then(async (response) => {
+          const a = await response.json();
+          temp.image = a.image;
+        })
+        .catch(() => {
+          temp.image = uri;
+          return null;
+        });
+    }
+    cb(temp);
+  } catch (error) {}
+});
+
 export type AssetReducer = {
   assets: Asset[];
   loading: boolean;
