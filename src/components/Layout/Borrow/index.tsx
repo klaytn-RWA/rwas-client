@@ -64,13 +64,6 @@ const Borrow: React.FC<{}> = () => {
               <div className="flex-1">
                 <SearchInput />
               </div>
-              <div className="flex justify-center items-center space-x-2 w-1/5">
-                <select className="px-4 py-2 w-full rounded-md bg-gray-100 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0 text-sm">
-                  <option value="">Top rate</option>
-                  <option value="for-rent">Low Liquidity Class</option>
-                  <option value="for-sale">High Liquidity Class</option>
-                </select>
-              </div>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 bg-white  border border-none rounded-xl max-h-[650px] overflow-auto p-4">
               {onShowBundleNFTs()}

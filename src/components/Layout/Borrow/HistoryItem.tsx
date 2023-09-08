@@ -14,10 +14,12 @@ const HistoryItem: React.FC<{ data: Intermediation }> = ({ data }) => {
         <div className="w-[50px] h-[50px] bg-blue-200 border border-none rounded-xl"></div>
         <div>
           <div className="flex space-x-1 text-[16px] leading-[20px]">
-            <div className="font-normal text-gray-900">{ethers.utils.formatUnits(data.amount.toString(), 8).toString()}</div>
+            <div className="font-normal text-gray-900">{ethers.utils.formatUnits(data.amount.toString(), 18).toString()}</div>
             <span className="font-semibold text-gray-900">USDT</span>
           </div>
-          <div className="text-[13px] text-gray-600 leading-[16px]">{new Date(Number(data.createdAt) * 1000).toUTCString()}</div>
+          <div className="text-[13px] text-gray-600 leading-[16px]">
+            {data.borrowedAt > 0 ? new Date(Number(data.borrowedAt) * 1000).toUTCString() : new Date(Number(data.createdAt) * 1000).toUTCString()}
+          </div>
           <div className="flex space-x-3">
             <div className="text-[13px] font-normal text-gray-700">
               Id: <span className="font-bold text-gray-900">#{Number(data.borrowReqId)}</span>
@@ -29,11 +31,18 @@ const HistoryItem: React.FC<{ data: Intermediation }> = ({ data }) => {
         </div>
       </div>
 
-      <div className="flex flex-col justify-end items-end">
-        <div className="text-[14px] font-semibold">Expire Loan</div>
-        <div className="text-[13px] text-gray-600 leading-[16px]">09 Sep 2023 • 12:28:13 GMT+7</div>
-        <div className="text-[14px] bg-[#413c69] px-2 text-center text-white font-bold border border-none rounded-xl">10 Days</div>
-      </div>
+      {data.returned && data.returnedAt > 0 && (
+        <div className="flex flex-col justify-end items-end">
+          <div className="text-[14px] bg-green-700 px-2 text-center text-white font-bold border border-none rounded-xl">Loan Paid</div>
+        </div>
+      )}
+      {!data.returned && data.lendOfferReqId > 0 && (
+        <div className="flex flex-col justify-end items-end">
+          <div className="text-[14px] font-semibold">Expire Loan</div>
+          <div className="text-[13px] text-gray-600 leading-[16px]">{new Date(Number(Number(data.borrowedAt + data.duration) * 1000)).toUTCString()}</div>
+          <div className="text-[14px] bg-[#413c69] px-2 text-center text-white font-bold border border-none rounded-xl">10 Days</div>
+        </div>
+      )}
     </div>
   );
 };

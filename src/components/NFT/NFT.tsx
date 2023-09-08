@@ -68,7 +68,7 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
             address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT! as any,
             abi: abiIntermadiation,
             functionName: "createBorrow",
-            args: [id, contract, ethers.utils.parseUnits("1000000", 8), ethers.utils.parseUnits("800000", 8), ethers.BigNumber.from(10 * 60)],
+            args: [id, contract, ethers.utils.parseUnits("1000000", 18), ethers.utils.parseUnits("800000", 18), ethers.BigNumber.from(10 * 60)],
           });
           if (createBorrowReq.hash) {
             dispatch(
@@ -131,10 +131,10 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
         };
 
         return (
-          <Popup className="bg-gray-50 min-w-[1000px] min-h-[700px]">
+          <Popup className="bg-gray-50 min-w-[800px] min-h-[700px]">
             <h1 className="mb-4 text-center font-bold text-[20px]">Create Borrow</h1>
             <div className="flex justify-center  space-x-2">
-              <div className="h-full w-1/4 shadow-xl border border-none rounded-xl p-2 bg-white">
+              <div className="h-full w-1/2 shadow-xl border border-none rounded-xl p-2 bg-white">
                 <div className="">
                   <div>
                     <img className="mx-auto max-w-[200px] max-h-[300px] border border-none rounded-xl" src={image} alt="nft-icon" />
@@ -146,8 +146,8 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
                       <NFTProperty title="code" content={indentifierCode!} />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
-                      <NFTProperty title="weight" content={`${weight} ${isQuickRaise ? "ounce" : "gram"}`} />
-                      <NFTProperty title="ounce" content={weight.toString()} />
+                      <NFTProperty title="weight" content={`${Number(ethers.utils.formatUnits(weight, 10)).toString()} ${isQuickRaise ? "ounce" : "gram"}`} />
+                      <NFTProperty title="ounce" content={Number(ethers.utils.formatUnits(weight, 10)).toString()} />
                     </div>
                   </div>
                   {isQuickRaise && (
@@ -160,7 +160,7 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
                   )}
                 </div>
               </div>
-              <div className="w-3/4 bg-blue-200 px-6 bg-white border border-none rounded-xl shadow-xl">
+              <div className="w-1/2 bg-blue-200 px-6 bg-white border border-none rounded-xl shadow-xl">
                 {/* Loan Amount */}
                 <div className="py-4">
                   <div className="text-[16px] font-bold">Loan Amount</div>
@@ -237,9 +237,9 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
                     </div>
                   </div>
                 </div>
-                <div className="flex justify-center items-center space-x-2 my-8">
+                <div className="flex flex-col justify-center items-center space-y-2 my-8">
                   <Button
-                    className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
+                    className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white w-[300px] leading-[21px]"
                     onClick={() => onHandleCreateBorrowReq()}
                     loading={loadingCreateBorrow}
                   >
@@ -247,7 +247,7 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
                   </Button>
                   {isQuickRaise && (
                     <Button
-                      className="bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
+                      className="bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% !rounded-3xl font-bold text-white w-[300px] leading-[21px]"
                       onClick={() => onHandleQuickBorrow()}
                       loading={loadingQuickBorrow}
                     >
@@ -275,7 +275,7 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
         {totalOraklPrice && (
           <div className="flex space-x-1">
             <div className="text-gray-900 text-[13px]">Oracl vaule:</div>
-            <div className="font-semibold text-[14px]">{Number(ethers.utils.formatUnits(totalOraklPrice, 8)).toString()}$</div>
+            <div className="font-semibold text-[14px]">{Number(ethers.utils.formatUnits(totalOraklPrice, 18)).toString()}$</div>
           </div>
         )}
         {appraisalPrice && (
@@ -287,7 +287,7 @@ const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) =>
         <div className="flex space-x-1">
           <div className="text-gray-900 text-[13px]">Weight:</div>
           <div className="font-semibold text-[14px]">
-            {weight.toString()} {isQuickRaise ? "ounce" : "gram"}
+            {Number(ethers.utils.formatUnits(weight, 10)).toString()} {isQuickRaise ? "ounce" : "gram"}
           </div>
         </div>
         {isQuickRaise && <div className="px-6 bg-green-700 font-bold text-white text-center border border-none rounded-2xl w-fit">Quick Raise</div>}
