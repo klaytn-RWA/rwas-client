@@ -1,24 +1,164 @@
+import { writeContract } from "@wagmi/core";
+import { ethers } from "ethers";
 import { useState } from "react";
+import { useAccount } from "wagmi";
+import abiIntermadiation from "../../abi/TranscaIntermediation.json";
+import { Asset, getAssets } from "../../redux/reducers/assetReducer";
+import { Bundle, getBundles } from "../../redux/reducers/bundleReducer";
+import { setToast } from "../../redux/reducers/toastReducer";
+import { useAppDispatch } from "../../redux/store";
 import cn from "../../services/cn";
+import Button from "../Button/Button";
 import Input from "../Input/Input";
 import Popup from "../Popup/Popup";
 import { usePopups } from "../Popup/PopupProvider";
 import KanaSelectDropdown, { COINS_DATA } from "../Selector/RadixSelector";
-import NFTDefault from "./NFTDefault";
+import NFTProperty from "./NFTProperty";
 
-const NFT: React.FC<{}> = () => {
+const NFT: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) => {
   const { addPopup } = usePopups();
+  console.log("7s200asset", asset);
+  let totalOraklPrice = 0;
+  let image = "";
+  let indentifierCode = "";
+  let appraisalPrice = 0;
+  let id = 0;
+  let userDefinePrice = 0;
+  let weight = 0;
+  let isQuickRaise = false;
+  let contract = "";
+  if (asset) {
+    totalOraklPrice = asset.oraklPrice;
+    image = asset.image;
+    appraisalPrice = asset.appraisalPrice;
+    id = asset.assetId;
+    weight = asset.weight;
+    isQuickRaise = asset.assetType === 0;
+    indentifierCode = asset.indentifierCode;
+    contract = import.meta.env.VITE_TRANSCA_ASSET_CONTRACT! as any;
+  }
+  if (bundle) {
+    totalOraklPrice = bundle.totalOraklValue;
+    image = bundle.uri;
+    let _weight = 0;
+    let _appraisalPrice = 0;
+    bundle.nfts.forEach((element) => {
+      _weight += element.weight;
+      _appraisalPrice += element.appraisalPrice;
+    });
+    weight = _weight;
+    appraisalPrice = _appraisalPrice;
+    id = bundle.id;
+    contract = import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT! as any;
+  }
 
   const onOpenPopup = () => {
     addPopup({
       Component: () => {
         const [currentCoin, setCurrentCoin] = useState(COINS_DATA[0].address);
+        const [loadingCreateBorrow, setLoadingCreateBorrow] = useState(false);
+        const [loadingQuickBorrow, setLoadingQuickBorrow] = useState(false);
+        const { address } = useAccount();
+        const { removeAll } = usePopups();
+        const dispatch = useAppDispatch();
+
+        const onHandleCreateBorrowReq = async () => {
+          setLoadingCreateBorrow(true);
+          const createBorrowReq = await writeContract({
+            address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT! as any,
+            abi: abiIntermadiation,
+            functionName: "createBorrow",
+            args: [id, contract, ethers.utils.parseUnits("1000000", 8), ethers.utils.parseUnits("800000", 8), ethers.BigNumber.from(10 * 60)],
+          });
+          if (createBorrowReq.hash) {
+            dispatch(
+              setToast({
+                show: true,
+                title: "",
+                message: "Create borrow request success",
+                type: "success",
+              }),
+            );
+            dispatch(getAssets({ address: address! }));
+            dispatch(getBundles({ address: address! }));
+            setLoadingCreateBorrow(false);
+            removeAll();
+          } else {
+            dispatch(
+              setToast({
+                show: true,
+                title: "",
+                message: "Something wrong!",
+                type: "error",
+              }),
+            );
+            setLoadingCreateBorrow(false);
+          }
+        };
+
+        const onHandleQuickBorrow = async () => {
+          setLoadingQuickBorrow(true);
+          const createBorrowReq = await writeContract({
+            address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT! as any,
+            abi: abiIntermadiation,
+            functionName: "createQuickBorrow",
+            args: [id, contract, ethers.BigNumber.from(100 * 60)],
+          });
+          if (createBorrowReq.hash) {
+            dispatch(
+              setToast({
+                show: true,
+                title: "",
+                message: "Create quick borrow request success",
+                type: "success",
+              }),
+            );
+            dispatch(getAssets({ address: address! }));
+            dispatch(getBundles({ address: address! }));
+            setLoadingQuickBorrow(false);
+            removeAll();
+          } else {
+            dispatch(
+              setToast({
+                show: true,
+                title: "",
+                message: "Something wrong!",
+                type: "error",
+              }),
+            );
+            setLoadingQuickBorrow(false);
+          }
+        };
+
         return (
-          <Popup className="bg-gray-50 min-w-[1200px] min-h-[700px]">
+          <Popup className="bg-gray-50 min-w-[1000px] min-h-[700px]">
             <h1 className="mb-4 text-center font-bold text-[20px]">Create Borrow</h1>
             <div className="flex justify-center  space-x-2">
               <div className="h-full w-1/4 shadow-xl border border-none rounded-xl p-2 bg-white">
-                <NFTDefault />
+                <div className="">
+                  <div>
+                    <img className="mx-auto max-w-[200px] max-h-[300px] border border-none rounded-xl" src={image} alt="nft-icon" />
+                    <div className="font-semibold text-center">#{id.toString()}</div>
+                  </div>
+                  <div>
+                    <div className="font-bold text-[14px] m-2">Properties</div>
+                    <div className="m-2">
+                      <NFTProperty title="code" content={indentifierCode!} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <NFTProperty title="weight" content={`${weight} ${isQuickRaise ? "ounce" : "gram"}`} />
+                      <NFTProperty title="ounce" content={weight.toString()} />
+                    </div>
+                  </div>
+                  {isQuickRaise && (
+                    <div className="my-4">
+                      <div className={`bg-green-100 border-green-500 w-fit  border  rounded-2xl text-green-700 px-4 py-3`} role="alert">
+                        <p className="font-bold text-[13px]">Quick Raise:</p>{" "}
+                        <p className="text-[13px]">{`Your #${id} is in High Liquidity Class, Transca will be fund for your NFT`}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="w-3/4 bg-blue-200 px-6 bg-white border border-none rounded-xl shadow-xl">
                 {/* Loan Amount */}
@@ -52,8 +192,8 @@ const NFT: React.FC<{}> = () => {
                 </div>
                 {/* Loan Interest */}
                 <div className="py-4">
-                  <div className="text-[16px] font-bold">Loan Interest</div>
-                  <div className="text-[13px]">Enter the interest rate</div>
+                  <div className="text-[16px] font-bold">Mint Loan Amount</div>
+                  <div className="text-[13px]">Enter the lowest price you can accept to borrow</div>
 
                   <div className="max-w-[400px] flex justify-between items-center border rounded-xl my-2">
                     <div className="px-2">
@@ -73,7 +213,6 @@ const NFT: React.FC<{}> = () => {
                         data={COINS_DATA}
                         currentCoin={currentCoin}
                         onSelectCoin={(data: string) => {
-                          console.log("7s200:data", data);
                           setCurrentCoin(data);
                         }}
                       />
@@ -98,6 +237,24 @@ const NFT: React.FC<{}> = () => {
                     </div>
                   </div>
                 </div>
+                <div className="flex justify-center items-center space-x-2 my-8">
+                  <Button
+                    className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
+                    onClick={() => onHandleCreateBorrowReq()}
+                    loading={loadingCreateBorrow}
+                  >
+                    Create Borrow Request
+                  </Button>
+                  {isQuickRaise && (
+                    <Button
+                      className="bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
+                      onClick={() => onHandleQuickBorrow()}
+                      loading={loadingQuickBorrow}
+                    >
+                      Quick Raise
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           </Popup>
@@ -105,22 +262,35 @@ const NFT: React.FC<{}> = () => {
       },
     });
   };
+
+  if (!asset && !bundle) return;
+
   return (
     <div className="p-2 border border-2 rounded-xl cursor-pointer shadow-2xl" onClick={() => onOpenPopup()}>
       <div className="flex justify-center items-center">
-        <img className="max-w-[200px] max-h-[350px] object-contain border border-none rounded-xl" src="/icons/gold1.png" alt="nft" />
+        <img className="w-[150px] h-[180px] border border-none rounded-xl" src={image} alt="nft" />
       </div>
       <div className="font-normal flex flex-col justify-center items-center space-y-2">
-        <div className="font-bold text-[16px]">#GOLD-01</div>
-        <div className="flex space-x-1">
-          <div className="text-gray-900 text-[13px]">Value:</div>
-          <div className="font-semibold text-[14px]">1500$</div>
-        </div>
+        <div className="font-bold text-[16px]">#{Number(id)}</div>
+        {totalOraklPrice && (
+          <div className="flex space-x-1">
+            <div className="text-gray-900 text-[13px]">Oracl vaule:</div>
+            <div className="font-semibold text-[14px]">{Number(ethers.utils.formatUnits(totalOraklPrice, 8)).toString()}$</div>
+          </div>
+        )}
+        {appraisalPrice && (
+          <div className="flex space-x-1">
+            <div className="text-gray-900 text-[13px]">Appraisal vaule:</div>
+            <div className="font-semibold text-[14px]">{appraisalPrice.toString()}$</div>
+          </div>
+        )}
         <div className="flex space-x-1">
           <div className="text-gray-900 text-[13px]">Weight:</div>
-          <div className="font-semibold text-[14px]">0.5 gram</div>
+          <div className="font-semibold text-[14px]">
+            {weight.toString()} {isQuickRaise ? "ounce" : "gram"}
+          </div>
         </div>
-        <div className="px-6 bg-green-700 font-bold text-white text-center border border-none rounded-2xl w-fit">Quick Raise</div>
+        {isQuickRaise && <div className="px-6 bg-green-700 font-bold text-white text-center border border-none rounded-2xl w-fit">Quick Raise</div>}
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import { Asset } from "./assetReducer";
 
 export type Bundle = {
   id: number;
+  totalOraklValue: number;
   uri: string;
   nfts: Array<Asset>;
 };
@@ -26,10 +27,25 @@ export const getBundles = createAsyncThunk("bundle/get", async ({ address }: { a
       args: [address!],
     });
     const _bundles = bundles as Array<Bundle>;
+    console.log("7s200:bundles", bundles);
     if (_bundles.length > 0) {
       let res: Array<Bundle> = [];
       for (let index = 0; index < _bundles.length; index++) {
         let nfts = [];
+        const totalOraklValue = await readContract({
+          address: import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT!,
+          abi: abiBundle,
+          functionName: "getValue",
+          args: [(_bundles[index] as any).bundleId],
+        });
+        const value = await readContract({
+          address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
+          abi: abiAsset,
+          functionName: "getLatestData",
+          args: [],
+        });
+        console.log("7s200:value", value);
+
         const uri = await readContract({
           address: import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT!,
           abi: abiAsset,
@@ -73,7 +89,7 @@ export const getBundles = createAsyncThunk("bundle/get", async ({ address }: { a
             nfts.push(temp);
           }
         }
-        res.push({ id: (_bundles[index] as any).bundleId, nfts: nfts, uri: resImg ? resImg.image : "" });
+        res.push({ id: (_bundles[index] as any).bundleId, nfts: nfts, totalOraklValue: totalOraklValue as number, uri: resImg ? resImg.image : "" });
       }
       return res;
     } else {

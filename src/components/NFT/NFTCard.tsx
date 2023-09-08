@@ -4,15 +4,16 @@ import { Asset } from "../../redux/reducers/assetReducer";
 
 const NFTCard: React.FC<{ nftData: Asset }> = ({ nftData }) => {
   const [asset] = useState(nftData);
+  console.log("7s200:asset", asset);
 
   return (
     <div className="nft-body">
       <div className="nft-container">
         <div className="card">
           <div className={`nft-front bg-cover bg-center`} style={{ backgroundImage: `url(${asset.image!})` }}>
-            {Number(ethers.utils.formatUnits(asset.oraklPrice, 26)) > 0 && (
+            {Number(ethers.utils.formatUnits(asset.oraklPrice, 8)) > 0 && (
               <div className="bg-green-600 text-white text-sm font-bold m-2 w-fit px-2 border border-none rounded-2xl">
-                {Number(ethers.utils.formatUnits(asset.oraklPrice!, 26)).toFixed(2)} $
+                {Number(ethers.utils.formatUnits(asset.oraklPrice!, 8)).toFixed(2)} $
               </div>
             )}
             {Number(asset.appraisalPrice) > 0 && (
@@ -35,7 +36,9 @@ const NFTCard: React.FC<{ nftData: Asset }> = ({ nftData }) => {
               </div>
               <div className="flex space-x-1">
                 <div>Weight:</div>
-                <div className="font-semibold">{ethers.utils.formatEther(asset.weight!)}</div>
+                <div className="font-semibold">
+                  {asset.weight.toString()} <span> {asset.assetType === 0 && "ounce"}</span>
+                </div>
               </div>
               <div className="flex space-x-1">
                 <div>Expire:</div>

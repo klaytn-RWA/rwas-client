@@ -1,4 +1,9 @@
 import { ArrowBack } from "@styled-icons/boxicons-regular";
+import { useEffect } from "react";
+import { useAccount } from "wagmi";
+import { getAssets, selectAsset } from "../../../redux/reducers/assetReducer";
+import { getBundles, selectBundle } from "../../../redux/reducers/bundleReducer";
+import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import Header from "../../Header/Header";
 import Message from "../../Message/Message";
 import NFT from "../../NFT/NFT";
@@ -6,6 +11,39 @@ import SearchInput from "../../Search/SearchInput";
 import BorrowHistory from "./BorrowHistory";
 
 const Borrow: React.FC<{}> = () => {
+  const dispatch = useAppDispatch();
+  const { address, isConnecting, isDisconnected } = useAccount();
+
+  const assetRx = useAppSelector(selectAsset);
+  const bundleRx = useAppSelector(selectBundle);
+
+  useEffect(() => {
+    dispatch(getAssets({ address: address! }));
+    dispatch(getBundles({ address: address! }));
+  }, []);
+
+  console.log("7s200:bundleRx", bundleRx);
+
+  const onShowNFTs = () => {
+    let nfts = null;
+    if (assetRx.assets.length > 0 && !assetRx.loading) {
+      nfts = assetRx.assets.map((e, i) => {
+        return <NFT key={i} asset={e} />;
+      });
+    }
+    return nfts;
+  };
+
+  const onShowBundleNFTs = () => {
+    let temp = null;
+    if (bundleRx.bundles.length > 0 && !bundleRx.loading) {
+      temp = bundleRx.bundles.map((e, i) => {
+        return <NFT key={i} bundle={e} />;
+      });
+    }
+    return temp;
+  };
+
   return (
     <div className="">
       <Header />
@@ -35,11 +73,8 @@ const Borrow: React.FC<{}> = () => {
               </div>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 bg-white  border border-none rounded-xl max-h-[650px] overflow-auto p-4">
-              <NFT />
-              <NFT />
-              <NFT />
-              <NFT />
-              <NFT />
+              {onShowBundleNFTs()}
+              {onShowNFTs()}
             </div>
           </div>
           <div className="w-full lg:w-1/3 bg-white border border-none rounded-xl">

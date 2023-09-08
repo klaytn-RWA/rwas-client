@@ -28,11 +28,9 @@ export const getAssets = createAsyncThunk("asset/get", async ({ address }: { add
       functionName: "getAllAssetByUser",
       args: [address],
     });
-    console.log("7s200:listAsset", listAsset);
     if (!listAsset || (listAsset as Array<Asset>).length === 0) {
       return [];
     } else {
-      console.log("7s200:case2");
       const list = listAsset as Array<Asset>;
 
       for (let index = 0; index < list.length; index++) {

@@ -23,8 +23,6 @@ const Portfolio: React.FC<{}> = () => {
     dispatch(getBundles({ address: address! }));
   }, []);
 
-  console.log("7s200assetRx", assetRx);
-
   // tokenURI
 
   const onShowNFTs = () => {
