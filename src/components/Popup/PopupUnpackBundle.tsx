@@ -28,7 +28,7 @@ const PopupUnpackBundle: React.FC<{ bundles: Array<any>; loadingData: boolean }>
     let temp = null;
     if (nfts.length > 0) {
       temp = nfts.map((e, i) => {
-        return <img className="w-[50px] h-[50px] border border-none rounded-xl" src={e._image} />;
+        return <img className="w-[50px] h-[50px] border border-none rounded-xl" src={e.image} />;
       });
     }
     return temp;
@@ -68,7 +68,7 @@ const PopupUnpackBundle: React.FC<{ bundles: Array<any>; loadingData: boolean }>
       return;
     }
     const write = await writeContract({
-      address: import.meta.env.VITE_TRANSCA_BUNDLE_NFT_CONTRACT! as any,
+      address: import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT! as any,
       abi: abiBundle,
       functionName: "withdraw",
       args: [activeBundle],

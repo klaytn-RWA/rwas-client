@@ -1,9 +1,7 @@
-import { readContract } from "@wagmi/core";
-import React, { useEffect, useState } from "react";
-import { useAccount, useContractRead } from "wagmi";
-import abiAsset from "../../../abi/TranscaAssetNFT.json";
-import abiBundle from "../../../abi/TranscaBundleNFT.json";
+import React, { useEffect } from "react";
+import { useAccount } from "wagmi";
 import { getAssets, selectAsset } from "../../../redux/reducers/assetReducer";
+import { getBundles, selectBundle } from "../../../redux/reducers/bundleReducer";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import Button from "../../Button/Button";
 import Message from "../../Message/Message";
@@ -32,66 +30,12 @@ const BundleService: React.FC = () => {
   const onOpenPopUpUnpackBundle = () => {
     addPopup({
       Component: () => {
-        const [bundles, setBundles] = useState<Array<any>>([]);
-        const { isLoading } = useContractRead({
-          address: import.meta.env.VITE_TRANSCA_BUNDLE_NFT_CONTRACT!,
-          abi: abiBundle,
-          functionName: "getAllBunelByOwner",
-          args: [address],
-          onSuccess: async (data: Array<any>) => {
-            if (data.length > 0) {
-              let res: Array<any> = [];
-              for (let index = 0; index < data.length; index++) {
-                let nfts = [];
-                const uri = await readContract({
-                  address: import.meta.env.VITE_TRANSCA_BUNDLE_NFT_CONTRACT!,
-                  abi: abiAsset,
-                  functionName: "tokenURI",
-                  args: [data[index]._bundleId],
-                });
-                const resImg = await fetch(uri as string)
-                  .then((response) => response.json())
-                  .catch(() => {
-                    return null;
-                  });
-
-                for (let j = 0; j < data[index]._assetIds.length; j++) {
-                  const nftData = await readContract({
-                    address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
-                    abi: abiAsset,
-                    functionName: "getAssetDetail",
-                    args: [data[index]._assetIds[j]],
-                  });
-
-                  let temp: any = nftData;
-                  const uri = await readContract({
-                    address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
-                    abi: abiAsset,
-                    functionName: "tokenURI",
-                    args: [data[index]._assetIds[j]],
-                  });
-                  if (uri) {
-                    await fetch(uri as string)
-                      .then(async (response) => {
-                        const a = await response.json();
-                        temp._image = a.image;
-                      })
-                      .catch(() => {
-                        temp._image = uri;
-                        return null;
-                      });
-                  }
-                  if (nftData) {
-                    nfts.push(temp);
-                  }
-                }
-                res.push({ id: data[index]._bundleId, nfts: nfts, uri: resImg ? resImg.image : "" });
-              }
-              setBundles(res);
-            }
-          },
-        });
-        return <PopupUnpackBundle bundles={bundles} loadingData={isLoading} />;
+        const dispatch = useAppDispatch();
+        const bundleRx = useAppSelector(selectBundle);
+        useEffect(() => {
+          dispatch(getBundles({ address: address! }));
+        }, []);
+        return <PopupUnpackBundle bundles={bundleRx.bundles} loadingData={bundleRx.loading} />;
       },
     });
   };
