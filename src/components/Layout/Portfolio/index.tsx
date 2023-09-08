@@ -1,95 +1,35 @@
 import { ArrowBack } from "@styled-icons/boxicons-regular";
-import { readContract } from "@wagmi/core";
-import { useEffect, useState } from "react";
-import { useAccount, useContractRead } from "wagmi";
+import { useEffect } from "react";
+import { useAccount } from "wagmi";
 import {} from "../../../../public/icons/diamond1.png";
-import abiAsset from "../../../abi/TranscaAssetNFT.json";
-import abiBundle from "../../../abi/TranscaBundleNFT.json";
 
 import { getAssets, selectAsset } from "../../../redux/reducers/assetReducer";
+import { getBundles, selectBundle } from "../../../redux/reducers/bundleReducer";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import Header from "../../Header/Header";
 import BundleNFT from "../../NFT/BundleNFT";
 import NFTCard from "../../NFT/NFTCard";
-import { usePopups } from "../../Popup/PopupProvider";
 import SearchInput from "../../Search/SearchInput";
 
 const Portfolio: React.FC<{}> = () => {
-  const [bundles, setBundles] = useState<Array<any>>([]);
-  const { addPopup } = usePopups();
   const dispatch = useAppDispatch();
   const { address, isConnecting, isDisconnected } = useAccount();
 
   const assetRx = useAppSelector(selectAsset);
+  const bundleRx = useAppSelector(selectBundle);
 
   useEffect(() => {
     dispatch(getAssets({ address: address! }));
+    dispatch(getBundles({ address: address! }));
   }, []);
 
-  const {} = useContractRead({
-    address: import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT!,
-    abi: abiBundle,
-    functionName: "getAllBunelByOwner",
-    args: [address],
-    onSuccess: async (data: Array<any>) => {
-      if (data.length > 0) {
-        let res: Array<any> = [];
-        for (let index = 0; index < data.length; index++) {
-          let nfts = [];
-          const uri = await readContract({
-            address: import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT!,
-            abi: abiAsset,
-            functionName: "tokenURI",
-            args: [data[index].bundleId],
-          });
-          const resImg = await fetch(uri as string)
-            .then((response) => response.json())
-            .catch(() => {
-              return null;
-            });
-
-          for (let j = 0; j < data[index]._assetIds.length; j++) {
-            const nftData = await readContract({
-              address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
-              abi: abiAsset,
-              functionName: "getAssetDetail",
-              args: [data[index].assetIds[j]],
-            });
-
-            let temp: any = nftData;
-            const uri = await readContract({
-              address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
-              abi: abiAsset,
-              functionName: "tokenURI",
-              args: [data[index].assetIds[j]],
-            });
-            if (uri) {
-              await fetch(uri as string)
-                .then(async (response) => {
-                  const a = await response.json();
-                  temp.image = a.image;
-                })
-                .catch(() => {
-                  temp.image = uri;
-                  return null;
-                });
-            }
-            if (nftData) {
-              nfts.push(temp);
-            }
-          }
-          res.push({ id: data[index].bundleId, nfts: nfts, uri: resImg ? resImg.image : "" });
-        }
-        setBundles(res);
-      }
-    },
-  });
+  console.log("7s200assetRx", assetRx);
 
   // tokenURI
 
   const onShowNFTs = () => {
     let nfts = null;
-    if (assetRx.assets.length > 0) {
+    if (assetRx.assets.length > 0 && !assetRx.loading) {
       nfts = assetRx.assets.map((e, i) => {
         return <NFTCard key={i} nftData={e} />;
       });
@@ -99,8 +39,8 @@ const Portfolio: React.FC<{}> = () => {
 
   const onShowBundleNFTs = () => {
     let temp = null;
-    if (bundles.length > 0) {
-      temp = bundles.map((e, i) => {
+    if (bundleRx.bundles.length > 0 && !bundleRx.loading) {
+      temp = bundleRx.bundles.map((e, i) => {
         return <BundleNFT bundle={e} key={i} />;
       });
     }
@@ -164,6 +104,7 @@ const Portfolio: React.FC<{}> = () => {
               </select>
             </div>
           </div>
+
           <div className="flex jusitfy-center items-center flex-wrap bg-white my-4 border border-none rounded-xl">
             {onShowBundleNFTs()}
             {onShowNFTs()}

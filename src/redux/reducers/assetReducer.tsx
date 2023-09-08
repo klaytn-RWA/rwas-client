@@ -28,33 +28,36 @@ export const getAssets = createAsyncThunk("asset/get", async ({ address }: { add
       functionName: "getAllAssetByUser",
       args: [address],
     });
+    console.log("7s200:listAsset", listAsset);
     if (!listAsset || (listAsset as Array<Asset>).length === 0) {
       return [];
-    }
-    const list = listAsset as Array<Asset>;
+    } else {
+      console.log("7s200:case2");
+      const list = listAsset as Array<Asset>;
 
-    for (let index = 0; index < list.length; index++) {
-      const uri = await readContract({
-        address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
-        abi: abiAsset,
-        functionName: "tokenURI",
-        args: [list[index].assetId],
-      });
-      if (uri) {
-        const response = await fetch(uri as string)
-          .then((response) => response.json())
-          .catch(() => {
-            return null;
-          });
-        if (response) {
-          list[index].image = response.image;
-        } else {
-          list[index].image = uri as any;
+      for (let index = 0; index < list.length; index++) {
+        const uri = await readContract({
+          address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
+          abi: abiAsset,
+          functionName: "tokenURI",
+          args: [list[index].assetId],
+        });
+        if (uri) {
+          const response = await fetch(uri as string)
+            .then((response) => response.json())
+            .catch(() => {
+              return null;
+            });
+          if (response) {
+            list[index].image = response.image;
+          } else {
+            list[index].image = uri as any;
+          }
         }
       }
-    }
 
-    return list;
+      return list;
+    }
   } catch (error: any) {
     return [];
   }
@@ -73,7 +76,8 @@ export const defaultAssetReducer: AssetReducer = {
 const assetReducer = createReducer(defaultAssetReducer, (builder) => {
   builder
     .addCase(getAssets.fulfilled, (state, action) => {
-      return { ...state, loading: false, assets: action.payload };
+      state.loading = false;
+      state.assets = action.payload;
     })
     .addCase(getAssets.rejected, (state) => {
       return { ...state, loading: false };

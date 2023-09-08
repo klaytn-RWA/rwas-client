@@ -2,7 +2,7 @@ import { CheckCircleFill } from "@styled-icons/bootstrap";
 import { writeContract } from "@wagmi/core";
 import { ethers } from "ethers";
 import React, { useState } from "react";
-import { useAccount, useWaitForTransaction } from "wagmi";
+import { useWaitForTransaction } from "wagmi";
 import abiBundle from "../../abi/TranscaBundleNFT.json";
 import { setToast } from "../../redux/reducers/toastReducer";
 import { useAppDispatch } from "../../redux/store";
@@ -11,10 +11,9 @@ import Popup from "./Popup";
 import { usePopups } from "./PopupProvider";
 
 const PopupCreateBundle: React.FC<{ nfts: Array<any>; loadingData: boolean }> = ({ nfts, loadingData }) => {
+  console.log("7s200:asset", nfts);
   const [acitves, setActives] = useState<Array<any>>([]);
   const [minting, setMinting] = useState(false);
-  const [sig, setSig] = useState("");
-  const { address } = useAccount();
   const { removeAll } = usePopups();
   const dispatch = useAppDispatch();
 
@@ -40,20 +39,21 @@ const PopupCreateBundle: React.FC<{ nfts: Array<any>; loadingData: boolean }> = 
     let temp = null;
     if (nfts.length > 0) {
       temp = nfts.map((e, i) => {
+        console.log("7s200:e", e.oraklPrice);
         return (
-          <tr key={i} className={`bg-[#251163] w-full border border-none rounded-xl text-gray-300 cursor-pointer`} onClick={() => onSelectNFT(Number(e._assetId))}>
+          <tr key={i} className={`bg-[#251163] w-full border border-none rounded-xl text-gray-300 cursor-pointer`} onClick={() => onSelectNFT(Number(e.assetId))}>
             <td className="px-4 py-3 text-center">
               <div>
-                <img className="max-w-[50px] max-h-[50px] border border-none rounded-xl" src={e._image} alt="nft" />
+                <img className="max-w-[50px] max-h-[50px] border border-none rounded-xl" src={e.image} alt="nft" />
               </div>
             </td>
-            <td className="px-4 py-3 text-center">{(e._assetType === 0 && "GOLD") || (e._assetType === 1 && "DIAMOND") || "OTHER"}</td>
-            <td className="px-4 py-3 text-center">{Number(ethers.utils.formatUnits(e._weight)).toFixed(2)}</td>
-            <td className="px-4 py-3 text-center">{Number(ethers.utils.formatUnits(e._oraklPrice, 26)).toFixed(2)}</td>
-            <td className="px-4 py-3 text-center">{Number(e._appraisalPrice).toFixed(2)}</td>
-            <td className="px-4 py-3 text-center">{Number(e._userDefinePrice).toFixed(2)}</td>
-            <td className="px-4 py-3 text-center">{e._indentifierCode}</td>
-            <td className="px-4 py-3 text-center">{checkActive(Number(e._assetId)) && <CheckCircleFill size={20} color="green" />}</td>
+            <td className="px-4 py-3 text-center">{(e.assetType === 0 && "GOLD") || (e.assetType === 1 && "DIAMOND") || "OTHER"}</td>
+            <td className="px-4 py-3 text-center">{Number(ethers.utils.formatUnits(e.weight)).toFixed(2)}</td>
+            <td className="px-4 py-3 text-center">{Number(ethers.utils.formatUnits(e.oraklPrice, 26)).toFixed(2)}</td>
+            <td className="px-4 py-3 text-center">{Number(e.appraisalPrice).toFixed(2)}</td>
+            <td className="px-4 py-3 text-center">{Number(e.userDefinePrice).toFixed(2)}</td>
+            <td className="px-4 py-3 text-center">{e.indentifierCode}</td>
+            <td className="px-4 py-3 text-center">{checkActive(Number(e.assetId)) && <CheckCircleFill size={20} color="green" />}</td>
           </tr>
         );
       });
@@ -86,7 +86,7 @@ const PopupCreateBundle: React.FC<{ nfts: Array<any>; loadingData: boolean }> = 
       return;
     }
     const write = await writeContract({
-      address: import.meta.env.VITE_TRANSCA_BUNDLE_NFT_CONTRACT! as any,
+      address: import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT! as any,
       abi: abiBundle,
       functionName: "deposit",
       args: [acitves],
@@ -161,7 +161,13 @@ const PopupCreateBundle: React.FC<{ nfts: Array<any>; loadingData: boolean }> = 
         >
           Create Bundle
         </Button>
-        <Button className="!rounded-3xl text-black font-bold text-white min-w-[200px] leading-[21px]" type="reset">
+        <Button
+          className="!rounded-3xl text-black font-bold text-white min-w-[200px] leading-[21px]"
+          type="reset"
+          onClick={() => {
+            removeAll();
+          }}
+        >
           Cancel
         </Button>
       </div>

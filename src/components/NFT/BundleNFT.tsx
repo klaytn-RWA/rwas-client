@@ -1,17 +1,20 @@
 import { ethers } from "ethers";
+import { Bundle } from "../../redux/reducers/bundleReducer";
 import Popup from "../Popup/Popup";
 import { usePopups } from "../Popup/PopupProvider";
 import NFTCard from "./NFTCard";
 
-const BundleNFT: React.FC<{ bundle: any }> = ({ bundle }) => {
+const BundleNFT: React.FC<{ bundle: Bundle }> = ({ bundle }) => {
   const { addPopup } = usePopups();
 
   const totalOraklPrice = () => {
     let price = ethers.BigNumber.from(0);
-    if (bundle.nfts.length > 0) {
-      bundle.nfts.forEach((e: any) => {
-        price = price.add(e._oraklPrice);
-      });
+    if (bundle.nfts) {
+      if (bundle.nfts.length > 0) {
+        bundle.nfts.forEach((e: any) => {
+          price = price.add(e.oraklPrice);
+        });
+      }
     }
     return Number(ethers.utils.formatUnits(price, 26)).toFixed(2);
   };
@@ -19,7 +22,6 @@ const BundleNFT: React.FC<{ bundle: any }> = ({ bundle }) => {
   const onOpenBundleDetail = () => {
     addPopup({
       Component: () => {
-        // const [currentCoin, setCurrentCoin] = useState(COINS_DATA[0].address);
         const onShowNFTs = () => {
           let nfts = null;
           if (bundle.nfts.length > 0) {

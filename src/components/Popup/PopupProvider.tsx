@@ -24,24 +24,19 @@ const PopupProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   const [popups, changePopups] = useState<{ key: string; Component: React.FC; closeWhenClickOutside?: boolean }[]>([]);
   const popupBackgroundService = useRef<HTMLDivElement | null>(null);
 
-  const [rootRemoveCallback, setRootRemoveCallback] = useState<() => void>(() => {});
-
   const addPopup: PopupType = ({ Component, callback, removeCallback, closeWhenClickOutside }): string => {
     const key = uuidv4();
     changePopups([...popups, { key, Component, closeWhenClickOutside }]);
     if (callback) callback(key);
-    if (removeCallback) setRootRemoveCallback(removeCallback);
     return key;
   };
 
   const removePopup = (key: string) => {
     changePopups(popups.filter((popup) => popup.key !== key));
-    rootRemoveCallback();
   };
 
   const removeAll = () => {
     changePopups([]);
-    rootRemoveCallback();
   };
 
   const Component = popups.length > 0 ? popups[popups.length - 1].Component : () => <></>;

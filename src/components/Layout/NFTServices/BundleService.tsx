@@ -1,8 +1,10 @@
 import { readContract } from "@wagmi/core";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAccount, useContractRead } from "wagmi";
 import abiAsset from "../../../abi/TranscaAssetNFT.json";
 import abiBundle from "../../../abi/TranscaBundleNFT.json";
+import { getAssets, selectAsset } from "../../../redux/reducers/assetReducer";
+import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import Button from "../../Button/Button";
 import Message from "../../Message/Message";
 import PopupCreateBundle from "../../Popup/PopupCreateBundle";
@@ -12,41 +14,17 @@ import PopupUnpackBundle from "../../Popup/PopupUnpackBundle";
 const BundleService: React.FC = () => {
   const { addPopup } = usePopups();
   const { address, isConnecting, isDisconnected } = useAccount();
+
   const onOpenPopUpCreateBundle = () => {
     addPopup({
       Component: () => {
-        const [listNFTs, setListNFTs] = useState<Array<any>>([]);
-        const { isLoading } = useContractRead({
-          address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
-          abi: abiAsset,
-          functionName: "getAllAssetByUser",
-          args: [address],
-          onSuccess: async (data: Array<any>) => {
-            for (let index = 0; index < data.length; index++) {
-              const uri = await readContract({
-                address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
-                abi: abiAsset,
-                functionName: "tokenURI",
-                args: [data[index]._assetId],
-              });
-              if (uri) {
-                const response = await fetch(uri as string)
-                  .then((response) => response.json())
-                  .catch(() => {
-                    return null;
-                  });
-                if (response) {
-                  data[index]._image = response.image;
-                } else {
-                  data[index]._image = uri;
-                }
-              }
-            }
-            setListNFTs(data);
-          },
-        });
+        const dispatch = useAppDispatch();
+        const assetRx = useAppSelector(selectAsset);
+        useEffect(() => {
+          dispatch(getAssets({ address: address! }));
+        }, []);
 
-        return <PopupCreateBundle nfts={listNFTs} loadingData={isLoading} />;
+        return <PopupCreateBundle nfts={assetRx.assets} loadingData={assetRx.loading} />;
       },
     });
   };

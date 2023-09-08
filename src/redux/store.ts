@@ -6,6 +6,7 @@ const createStore = () => {
     reducer: {
       toast: toastReducer,
       asset: assetReducer,
+      bundle: bundleReducer,
     },
   });
 };
@@ -18,6 +19,7 @@ export const refreshStore = () => {
 
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import assetReducer from "./reducers/assetReducer";
+import bundleReducer from "./reducers/bundleReducer";
 
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
