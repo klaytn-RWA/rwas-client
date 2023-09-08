@@ -1,12 +1,13 @@
 import { ArrowBack } from "@styled-icons/boxicons-regular";
 import { readContract } from "@wagmi/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount, useContractRead } from "wagmi";
 import {} from "../../../../public/icons/diamond1.png";
 import abiAsset from "../../../abi/TranscaAssetNFT.json";
 import abiBundle from "../../../abi/TranscaBundleNFT.json";
 
-import { useAppDispatch } from "../../../redux/store";
+import { getAssets, selectAsset } from "../../../redux/reducers/assetReducer";
+import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import Header from "../../Header/Header";
 import BundleNFT from "../../NFT/BundleNFT";
 import NFTCard from "../../NFT/NFTCard";
@@ -14,44 +15,19 @@ import { usePopups } from "../../Popup/PopupProvider";
 import SearchInput from "../../Search/SearchInput";
 
 const Portfolio: React.FC<{}> = () => {
-  const [listNFTs, setListNFTs] = useState<Array<any>>([]);
   const [bundles, setBundles] = useState<Array<any>>([]);
   const { addPopup } = usePopups();
   const dispatch = useAppDispatch();
   const { address, isConnecting, isDisconnected } = useAccount();
 
-  const {} = useContractRead({
-    address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
-    abi: abiAsset,
-    functionName: "getAllAssetByUser",
-    args: [address],
-    onSuccess: async (data: Array<any>) => {
-      for (let index = 0; index < data.length; index++) {
-        const uri = await readContract({
-          address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
-          abi: abiAsset,
-          functionName: "tokenURI",
-          args: [data[index]._assetId],
-        });
-        if (uri) {
-          const response = await fetch(uri as string)
-            .then((response) => response.json())
-            .catch(() => {
-              return null;
-            });
-          if (response) {
-            data[index]._image = response.image;
-          } else {
-            data[index]._image = uri;
-          }
-        }
-      }
-      setListNFTs(data);
-    },
-  });
+  const assetRx = useAppSelector(selectAsset);
+
+  useEffect(() => {
+    dispatch(getAssets({ address: address! }));
+  }, []);
 
   const {} = useContractRead({
-    address: import.meta.env.VITE_TRANSCA_BUNDLE_NFT_CONTRACT!,
+    address: import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT!,
     abi: abiBundle,
     functionName: "getAllBunelByOwner",
     args: [address],
@@ -61,10 +37,10 @@ const Portfolio: React.FC<{}> = () => {
         for (let index = 0; index < data.length; index++) {
           let nfts = [];
           const uri = await readContract({
-            address: import.meta.env.VITE_TRANSCA_BUNDLE_NFT_CONTRACT!,
+            address: import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT!,
             abi: abiAsset,
             functionName: "tokenURI",
-            args: [data[index]._bundleId],
+            args: [data[index].bundleId],
           });
           const resImg = await fetch(uri as string)
             .then((response) => response.json())
@@ -77,7 +53,7 @@ const Portfolio: React.FC<{}> = () => {
               address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
               abi: abiAsset,
               functionName: "getAssetDetail",
-              args: [data[index]._assetIds[j]],
+              args: [data[index].assetIds[j]],
             });
 
             let temp: any = nftData;
@@ -85,16 +61,16 @@ const Portfolio: React.FC<{}> = () => {
               address: import.meta.env.VITE_TRANSCA_NFT_CONTRACT!,
               abi: abiAsset,
               functionName: "tokenURI",
-              args: [data[index]._assetIds[j]],
+              args: [data[index].assetIds[j]],
             });
             if (uri) {
               await fetch(uri as string)
                 .then(async (response) => {
                   const a = await response.json();
-                  temp._image = a.image;
+                  temp.image = a.image;
                 })
                 .catch(() => {
-                  temp._image = uri;
+                  temp.image = uri;
                   return null;
                 });
             }
@@ -102,7 +78,7 @@ const Portfolio: React.FC<{}> = () => {
               nfts.push(temp);
             }
           }
-          res.push({ id: data[index]._bundleId, nfts: nfts, uri: resImg ? resImg.image : "" });
+          res.push({ id: data[index].bundleId, nfts: nfts, uri: resImg ? resImg.image : "" });
         }
         setBundles(res);
       }
@@ -113,8 +89,8 @@ const Portfolio: React.FC<{}> = () => {
 
   const onShowNFTs = () => {
     let nfts = null;
-    if (listNFTs.length > 0) {
-      nfts = listNFTs.map((e, i) => {
+    if (assetRx.assets.length > 0) {
+      nfts = assetRx.assets.map((e, i) => {
         return <NFTCard key={i} nftData={e} />;
       });
     }

@@ -5,6 +5,7 @@ const createStore = () => {
   return configureStore({
     reducer: {
       toast: toastReducer,
+      asset: assetReducer,
     },
   });
 };
@@ -16,6 +17,7 @@ export const refreshStore = () => {
 };
 
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import assetReducer from "./reducers/assetReducer";
 
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
