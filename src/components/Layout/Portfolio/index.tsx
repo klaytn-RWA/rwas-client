@@ -107,16 +107,18 @@ const Portfolio: React.FC<{}> = () => {
               </select>
             </div>
           </div>
-          {!onShowBundleNFTs() && !onShowBundleNFTs() ? (
+          {!onShowBundleNFTs() && !onShowNFTs() && (
             <div className="text-center flex justify-center items-center  border border-none rounded-xl min-h-[600px] bg-white my-4 font-bold">
               {address && isConnected ? "Empty" : <ConnectButton />}
             </div>
-          ) : (
-            <div className="flex jusitfy-center items-center flex-wrap bg-white my-4 border border-none rounded-xl">
-              {onShowBundleNFTs()}
-              {onShowNFTs()}
-            </div>
           )}
+          {onShowBundleNFTs() ||
+            (onShowNFTs() && (
+              <div className="flex jusitfy-center items-center flex-wrap bg-white my-4 border border-none rounded-xl">
+                {onShowBundleNFTs()}
+                {onShowNFTs()}
+              </div>
+            ))}
         </div>
       </div>
     </>
