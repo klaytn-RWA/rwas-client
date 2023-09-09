@@ -54,7 +54,6 @@ export const getAssets = createAsyncThunk("asset/get", async ({ address }: { add
           }
         }
       }
-
       return list;
     }
   } catch (error: any) {
