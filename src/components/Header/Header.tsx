@@ -7,11 +7,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { History } from "@styled-icons/boxicons-regular";
 
 import NFT_ICON from "../../../public/icons/card.png";
+import Button from "../Button/Button";
+import PopupGetRWAsNFT from "../Popup/PopupGetRWAsNFT";
+import { usePopups } from "../Popup/PopupProvider";
 const Header: React.FC<{}> = () => {
   const [isOpenMobileMenu, setIsOpenMobileMenu] = useState(false);
   const menuBackgroundService = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
   const data = useLocation();
+
+  const { addPopup } = usePopups();
 
   const onOpenMobileMenu = () => {
     setIsOpenMobileMenu(!isOpenMobileMenu);
@@ -28,6 +33,13 @@ const Header: React.FC<{}> = () => {
       window.removeEventListener("resize", handleWindowResize);
     };
   }, []);
+  const onHanleOpenPopUpGetRWAsNFT = () => {
+    addPopup({
+      Component: () => {
+        return <PopupGetRWAsNFT />;
+      },
+    });
+  };
 
   return (
     <>
@@ -52,13 +64,20 @@ const Header: React.FC<{}> = () => {
                   />
                 </svg>
               </button>
-              <div
-                onClick={() => {
-                  navigate("/");
-                }}
-                className="cursor-pointer flex ml-2 md:mr-24"
-              >
-                <img src="/icons/transca-vault-logo.svg" className="h-6 mr-3" alt="Transca vault Logo" />
+              <div className="flex items-center">
+                <div
+                  onClick={() => {
+                    navigate("/");
+                  }}
+                  className="cursor-pointer flex ml-2 md:mr-7"
+                >
+                  <img src="/icons/transca-vault-logo.svg" className="h-6" alt="Transca vault Logo" />
+                </div>
+                <div className="">
+                  <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 !rounded-xl font-bold text-white leading-[21px]" onClick={() => onHanleOpenPopUpGetRWAsNFT()}>
+                    Get RWAs NFT
+                  </Button>
+                </div>
               </div>
             </div>
             {/* Connect wallet */}
