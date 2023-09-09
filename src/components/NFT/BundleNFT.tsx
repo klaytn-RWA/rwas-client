@@ -16,7 +16,7 @@ const BundleNFT: React.FC<{ bundle: Bundle }> = ({ bundle }) => {
         });
       }
     }
-    return Number(ethers.utils.formatUnits(price, 26)).toFixed(2);
+    return Number(ethers.utils.formatEther(price)).toFixed(2);
   };
 
   const onOpenBundleDetail = () => {

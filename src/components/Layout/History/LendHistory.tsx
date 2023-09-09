@@ -24,12 +24,18 @@ const LendHistory: React.FC<{}> = () => {
     if (histories.length > 0) {
       return histories;
     }
-    return <>Empty</>;
+    return null;
   };
 
-  console.log("7s2002:empty", onShowHistory());
-
-  return <div className="flex flex-col space-y-2 overflow-auto py-2 max-h-[650px] scroll-smooth">{onShowHistory()}</div>;
+  return (
+    <>
+      {!onShowHistory() ? (
+        <div className="flex justify-center items-center min-h-[650px] font-bold">Empty</div>
+      ) : (
+        <div className="flex flex-col space-y-2 overflow-auto py-2 max-h-[650px] scroll-smooth">{onShowHistory()}</div>
+      )}
+    </>
+  );
 };
 
 export default LendHistory;

@@ -1,8 +1,7 @@
 import { CheckCircleFill } from "@styled-icons/bootstrap";
-import { writeContract } from "@wagmi/core";
+import { waitForTransaction, writeContract } from "@wagmi/core";
 import { ethers } from "ethers";
 import React, { useState } from "react";
-import { useWaitForTransaction } from "wagmi";
 import abiBundle from "../../abi/TranscaBundleNFT.json";
 import { setToast } from "../../redux/reducers/toastReducer";
 import { useAppDispatch } from "../../redux/store";
@@ -11,7 +10,6 @@ import Popup from "./Popup";
 import { usePopups } from "./PopupProvider";
 
 const PopupCreateBundle: React.FC<{ nfts: Array<any>; loadingData: boolean }> = ({ nfts, loadingData }) => {
-  console.log("7s200:asset", nfts);
   const [acitves, setActives] = useState<Array<any>>([]);
   const [minting, setMinting] = useState(false);
   const { removeAll } = usePopups();
@@ -39,7 +37,6 @@ const PopupCreateBundle: React.FC<{ nfts: Array<any>; loadingData: boolean }> = 
     let temp = null;
     if (nfts.length > 0) {
       temp = nfts.map((e, i) => {
-        console.log("7s200:e", e.oraklPrice);
         return (
           <tr key={i} className={`bg-[#251163] w-full border border-none rounded-xl text-gray-300 cursor-pointer`} onClick={() => onSelectNFT(Number(e.assetId))}>
             <td className="px-4 py-3 text-center">
@@ -60,16 +57,6 @@ const PopupCreateBundle: React.FC<{ nfts: Array<any>; loadingData: boolean }> = 
     }
     return temp;
   };
-
-  const {
-    data: txData,
-    isError: txError,
-    isLoading: txLoading,
-    isFetched,
-  } = useWaitForTransaction({
-    confirmations: 3,
-    // hash: mintData?.hash,
-  });
 
   const onHandleMintBundle = async () => {
     setMinting(true);
@@ -92,17 +79,30 @@ const PopupCreateBundle: React.FC<{ nfts: Array<any>; loadingData: boolean }> = 
       args: [acitves],
     });
     if (write.hash) {
-      dispatch(
-        setToast({
-          show: true,
-          title: "",
-          message: "Mint bundle success!",
-          type: "success",
-        }),
-      );
-      setMinting(false);
-      removeAll();
-      return;
+      const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: write.hash });
+      if (waitTranscation.status === "success") {
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Create bundle success",
+            type: "success",
+          }),
+        );
+        setMinting(false);
+        removeAll();
+        return;
+      } else {
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Transcation wrong!",
+            type: "error",
+          }),
+        );
+        return;
+      }
     } else {
       dispatch(
         setToast({

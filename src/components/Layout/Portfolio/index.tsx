@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useAccount } from "wagmi";
 import {} from "../../../../public/icons/diamond1.png";
 
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { getAssets, selectAsset } from "../../../redux/reducers/assetReducer";
 import { getBundles, selectBundle } from "../../../redux/reducers/bundleReducer";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
@@ -13,7 +14,7 @@ import SearchInput from "../../Search/SearchInput";
 
 const Portfolio: React.FC<{}> = () => {
   const dispatch = useAppDispatch();
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address, isConnected } = useAccount();
 
   const assetRx = useAppSelector(selectAsset);
   const bundleRx = useAppSelector(selectBundle);
@@ -23,26 +24,30 @@ const Portfolio: React.FC<{}> = () => {
     dispatch(getBundles({ address: address! }));
   }, []);
 
-  // tokenURI
-
   const onShowNFTs = () => {
-    let nfts = null;
+    let temp: Array<any> = [];
     if (assetRx.assets.length > 0 && !assetRx.loading) {
-      nfts = assetRx.assets.map((e, i) => {
-        return <NFTCard key={i} nftData={e} />;
+      assetRx.assets.forEach((e, i) => {
+        temp.push(<NFTCard key={i} nftData={e} />);
       });
     }
-    return nfts;
+    if (temp.length > 0) {
+      return temp;
+    }
+    return null;
   };
 
   const onShowBundleNFTs = () => {
-    let temp = null;
+    let temp: Array<any> = [];
     if (bundleRx.bundles.length > 0 && !bundleRx.loading) {
-      temp = bundleRx.bundles.map((e, i) => {
-        return <BundleNFT bundle={e} key={i} />;
+      bundleRx.bundles.forEach((e, i) => {
+        temp.push(<BundleNFT bundle={e} key={i} />);
       });
     }
-    return temp;
+    if (temp.length > 0) {
+      return temp;
+    }
+    return null;
   };
 
   return (
@@ -102,11 +107,16 @@ const Portfolio: React.FC<{}> = () => {
               </select>
             </div>
           </div>
-
-          <div className="flex jusitfy-center items-center flex-wrap bg-white my-4 border border-none rounded-xl">
-            {onShowBundleNFTs()}
-            {onShowNFTs()}
-          </div>
+          {!onShowBundleNFTs() && !onShowBundleNFTs() ? (
+            <div className="text-center flex justify-center items-center  border border-none rounded-xl min-h-[600px] bg-white my-4 font-bold">
+              {address && isConnected ? "Empty" : <ConnectButton />}
+            </div>
+          ) : (
+            <div className="flex jusitfy-center items-center flex-wrap bg-white my-4 border border-none rounded-xl">
+              {onShowBundleNFTs()}
+              {onShowNFTs()}
+            </div>
+          )}
         </div>
       </div>
     </>

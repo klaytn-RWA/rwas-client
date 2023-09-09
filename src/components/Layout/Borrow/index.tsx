@@ -1,3 +1,4 @@
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ArrowBack } from "@styled-icons/boxicons-regular";
 import { useEffect } from "react";
 import { useAccount } from "wagmi";
@@ -12,7 +13,7 @@ import BorrowHistory from "../History/BorrowHistory";
 
 const Borrow: React.FC<{}> = () => {
   const dispatch = useAppDispatch();
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address, isConnected } = useAccount();
 
   const assetRx = useAppSelector(selectAsset);
   const bundleRx = useAppSelector(selectBundle);
@@ -22,26 +23,30 @@ const Borrow: React.FC<{}> = () => {
     dispatch(getBundles({ address: address! }));
   }, []);
 
-  console.log("7s200:bundleRx", bundleRx);
-
   const onShowNFTs = () => {
-    let nfts = null;
+    let nfts: Array<any> = [];
     if (assetRx.assets.length > 0 && !assetRx.loading) {
       nfts = assetRx.assets.map((e, i) => {
         return <NFTBorrowItem key={i} asset={e} />;
       });
     }
-    return nfts;
+    if (nfts.length > 0) {
+      return nfts;
+    }
+    return null;
   };
 
   const onShowBundleNFTs = () => {
-    let temp = null;
+    let temp: Array<any> = [];
     if (bundleRx.bundles.length > 0 && !bundleRx.loading) {
       temp = bundleRx.bundles.map((e, i) => {
         return <NFTBorrowItem key={i} bundle={e} />;
       });
     }
-    return temp;
+    if (temp.length > 0) {
+      return temp;
+    }
+    return null;
   };
 
   return (
@@ -65,10 +70,16 @@ const Borrow: React.FC<{}> = () => {
                 <SearchInput />
               </div>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 bg-white  border border-none rounded-xl max-h-[650px] overflow-auto p-4">
-              {onShowBundleNFTs()}
-              {onShowNFTs()}
-            </div>
+            {!onShowNFTs() && !onShowBundleNFTs() ? (
+              <div className="text-center flex justify-center items-center  border border-none rounded-xl min-h-[600px] bg-white p-4 font-bold">
+                {address && isConnected ? "Empty" : <ConnectButton />}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 bg-white  border border-none rounded-xl max-h-[650px] overflow-auto p-4">
+                {onShowBundleNFTs()}
+                {onShowNFTs()}
+              </div>
+            )}
           </div>
           <div className="w-full lg:w-1/3 bg-white border border-none rounded-xl">
             <h3 className="text-[16px] font-bold mx-4 my-4">Your Borrowing</h3>

@@ -4,7 +4,6 @@ import { Asset } from "../../redux/reducers/assetReducer";
 
 const NFTCard: React.FC<{ nftData: Asset }> = ({ nftData }) => {
   const [asset] = useState(nftData);
-  console.log("7s200:asset", asset);
 
   return (
     <div className="nft-body">

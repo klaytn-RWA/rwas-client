@@ -4,6 +4,8 @@ import { HandCoin } from "@styled-icons/remix-line";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { History } from "@styled-icons/boxicons-regular";
+
 import NFT_ICON from "../../../public/icons/card.png";
 const Header: React.FC<{}> = () => {
   const [isOpenMobileMenu, setIsOpenMobileMenu] = useState(false);
@@ -152,7 +154,7 @@ const Header: React.FC<{}> = () => {
                   data.pathname === "/history" && "bg-gray-100"
                 }`}
               >
-                <img src={NFT_ICON} className="h-[24px] w-[24px]" />
+                <History size={24} />
                 <span className="ml-3">History</span>
               </div>
             </li>

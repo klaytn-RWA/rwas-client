@@ -1,3 +1,4 @@
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import React, { useEffect } from "react";
 import { useAccount } from "wagmi";
 import { getAssets, selectAsset } from "../../../redux/reducers/assetReducer";
@@ -11,7 +12,7 @@ import PopupUnpackBundle from "../../Popup/PopupUnpackBundle";
 
 const BundleService: React.FC = () => {
   const { addPopup } = usePopups();
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address, isConnected } = useAccount();
 
   const onOpenPopUpCreateBundle = () => {
     addPopup({
@@ -55,20 +56,27 @@ const BundleService: React.FC = () => {
           }
         />
       </div>
-      <div className="flex space-x-4 justify-center items-center my-4">
-        <Button
-          className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
-          onClick={() => onOpenPopUpCreateBundle()}
-        >
-          Create Bundle
-        </Button>
-        <Button
-          className="bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
-          onClick={() => onOpenPopUpUnpackBundle()}
-        >
-          Unpack Bundle
-        </Button>
-      </div>
+      {address && isConnected && (
+        <div className="flex space-x-4 justify-center items-center my-4">
+          <Button
+            className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
+            onClick={() => onOpenPopUpCreateBundle()}
+          >
+            Create Bundle
+          </Button>
+          <Button
+            className="bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
+            onClick={() => onOpenPopUpUnpackBundle()}
+          >
+            Unpack Bundle
+          </Button>
+        </div>
+      )}
+      {!isConnected && (
+        <div className="flex space-x-4 justify-center items-center my-4">
+          <ConnectButton />
+        </div>
+      )}
     </div>
   );
 };

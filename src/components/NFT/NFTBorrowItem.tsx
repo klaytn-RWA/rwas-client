@@ -1,4 +1,4 @@
-import { writeContract } from "@wagmi/core";
+import { waitForTransaction, writeContract } from "@wagmi/core";
 import { ethers } from "ethers";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -6,6 +6,7 @@ import { useAccount } from "wagmi";
 import abiIntermadiation from "../../abi/TranscaIntermediation.json";
 import { Asset, getAssets } from "../../redux/reducers/assetReducer";
 import { Bundle, getBundles } from "../../redux/reducers/bundleReducer";
+import { getBorrowReqs } from "../../redux/reducers/intermediationReducer";
 import { setToast } from "../../redux/reducers/toastReducer";
 import { useAppDispatch } from "../../redux/store";
 import cn from "../../services/cn";
@@ -15,6 +16,8 @@ import Input from "../Input/Input";
 import Popup from "../Popup/Popup";
 import { usePopups } from "../Popup/PopupProvider";
 import KanaSelectDropdown, { COINS_DATA } from "../Selector/RadixSelector";
+import BundleNFT from "./BundleNFT";
+import NFTCard from "./NFTCard";
 import NFTProperty from "./NFTProperty";
 type BrrowType = {
   loanAmount: string;
@@ -24,7 +27,6 @@ type BrrowType = {
 
 const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) => {
   const { addPopup } = usePopups();
-  console.log("7s200asset", asset);
   let totalOraklPrice = 0;
   let image = "";
   let indentifierCode = "";
@@ -45,12 +47,13 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
   }
   if (bundle) {
     totalOraklPrice = bundle.totalOraklValue;
+    isQuickRaise = bundle.totalOraklValue > 0;
     image = bundle.uri;
     let _weight = 0;
     let _appraisalPrice = 0;
     bundle.nfts.forEach((element) => {
-      _weight += element.weight;
-      _appraisalPrice += element.appraisalPrice;
+      _weight += Number(element.weight);
+      _appraisalPrice += Number(element.appraisalPrice);
     });
     weight = _weight;
     appraisalPrice = _appraisalPrice;
@@ -144,21 +147,37 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
             address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT! as any,
             abi: abiIntermadiation,
             functionName: "createBorrow",
-            args: [id, contract, ethers.utils.parseUnits(data.loanAmount, 18), ethers.utils.parseUnits(data.minLoanAmount, 18), ethers.BigNumber.from(data.duration)],
+            args: [id, contract, ethers.utils.parseUnits(data.loanAmount, 18), ethers.utils.parseUnits(data.minLoanAmount, 18), ethers.BigNumber.from(Number(data.duration))],
           });
           if (createBorrowReq.hash) {
-            dispatch(
-              setToast({
-                show: true,
-                title: "",
-                message: "Create borrow request success",
-                type: "success",
-              }),
-            );
-            dispatch(getAssets({ address: address! }));
-            dispatch(getBundles({ address: address! }));
-            setLoadingCreateBorrow(false);
-            removeAll();
+            const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: createBorrowReq.hash });
+            if (waitTranscation.status === "success") {
+              dispatch(
+                setToast({
+                  show: true,
+                  title: "",
+                  message: "Create borrow request success",
+                  type: "success",
+                }),
+              );
+              dispatch(getAssets({ address: address! }));
+              dispatch(getBundles({ address: address! }));
+              dispatch(getBorrowReqs({}));
+              setLoadingCreateBorrow(false);
+              removeAll();
+              return;
+            } else {
+              dispatch(
+                setToast({
+                  show: true,
+                  title: "",
+                  message: "Transcation wrong!",
+                  type: "error",
+                }),
+              );
+              setLoadingCreateBorrow(false);
+              return;
+            }
           } else {
             dispatch(
               setToast({
@@ -213,17 +232,25 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
               <div className="h-full w-1/2 shadow-xl border border-none rounded-xl p-2 bg-white">
                 <div className="">
                   <div>
-                    <img className="mx-auto max-w-[200px] max-h-[300px] border border-none rounded-xl" src={image} alt="nft-icon" />
+                    <div className="flex justify-center items-center">
+                      {asset && <NFTCard nftData={asset} />}
+                      {bundle && <BundleNFT bundle={bundle} />}
+                    </div>
                     <div className="font-semibold text-center">#{id.toString()}</div>
                   </div>
                   <div>
                     <div className="font-bold text-[14px] m-2">Properties</div>
-                    <div className="m-2">
-                      <NFTProperty title="code" content={indentifierCode!} />
-                    </div>
+                    {asset && (
+                      <div className="m-2">
+                        <NFTProperty title="code" content={indentifierCode!} />
+                      </div>
+                    )}
                     <div className="grid grid-cols-2 gap-2">
                       <NFTProperty title="weight" content={`${Number(ethers.utils.formatUnits(weight, 10)).toString()} ${isQuickRaise ? "ounce" : "gram"}`} />
-                      <NFTProperty title="ounce" content={Number(ethers.utils.formatUnits(weight, 10)).toString()} />
+                      {asset?.assetType === 0 ||
+                        (bundle?.totalOraklValue && (
+                          <NFTProperty title="Total gold value" content={`${Number(ethers.utils.formatEther(asset ? asset.oraklPrice : bundle.totalOraklValue)).toFixed(2)}$`} />
+                        ))}
                     </div>
                   </div>
                   {isQuickRaise && (
@@ -348,17 +375,18 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
   return (
     <div className="p-2 border border-2 rounded-xl cursor-pointer shadow-2xl" onClick={() => onOpenPopup()}>
       <div className="flex justify-center items-center">
-        <img className="w-[150px] h-[180px] border border-none rounded-xl" src={image} alt="nft" />
+        {asset && <NFTCard nftData={asset} />}
+        {bundle && <BundleNFT bundle={bundle} />}
       </div>
       <div className="font-normal flex flex-col justify-center items-center space-y-2">
         <div className="font-bold text-[16px]">#{Number(id)}</div>
         {totalOraklPrice && (
           <div className="flex space-x-1">
-            <div className="text-gray-900 text-[13px]">Oracl vaule:</div>
-            <div className="font-semibold text-[14px]">{Number(ethers.utils.formatUnits(totalOraklPrice, 18)).toString()}$</div>
+            <div className="text-gray-900 text-[13px]">Oracle vaule:</div>
+            <div className="font-semibold text-[14px]">{Number(ethers.utils.formatUnits(totalOraklPrice, 18)).toFixed(2)}$</div>
           </div>
         )}
-        {appraisalPrice && (
+        {appraisalPrice > 0 && (
           <div className="flex space-x-1">
             <div className="text-gray-900 text-[13px]">Appraisal vaule:</div>
             <div className="font-semibold text-[14px]">{appraisalPrice.toString()}$</div>

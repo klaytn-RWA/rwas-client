@@ -1,5 +1,5 @@
 import { CheckCircleFill } from "@styled-icons/bootstrap";
-import { writeContract } from "@wagmi/core";
+import { waitForTransaction, writeContract } from "@wagmi/core";
 import React, { useState } from "react";
 import abiBundle from "../../abi/TranscaBundleNFT.json";
 import { setToast } from "../../redux/reducers/toastReducer";
@@ -38,7 +38,6 @@ const PopupUnpackBundle: React.FC<{ bundles: Array<any>; loadingData: boolean }>
     let temp = null;
     if (bundles.length > 0) {
       temp = bundles.map((e, i) => {
-        console.log("7s200e", e);
         return (
           <tr key={i} className={`bg-[#251163] w-full border border-none rounded-xl text-gray-300 cursor-pointer`} onClick={() => onSelectBundle(e.id)}>
             <td className="px-4 py-3 text-center font-bold">#{Number(e.id)} </td>
@@ -74,17 +73,30 @@ const PopupUnpackBundle: React.FC<{ bundles: Array<any>; loadingData: boolean }>
       args: [activeBundle],
     });
     if (write.hash) {
-      dispatch(
-        setToast({
-          show: true,
-          title: "",
-          message: "Unpack bundle success!",
-          type: "success",
-        }),
-      );
-      setUnpacking(false);
-      removeAll();
-      return;
+      const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: write.hash });
+      if (waitTranscation.status === "success") {
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Unpack bundle success!",
+            type: "success",
+          }),
+        );
+        setUnpacking(false);
+        removeAll();
+        return;
+      } else {
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Transcation wrong!",
+            type: "error",
+          }),
+        );
+        return;
+      }
     } else {
       dispatch(
         setToast({
