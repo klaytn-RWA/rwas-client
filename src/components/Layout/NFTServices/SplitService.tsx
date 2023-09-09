@@ -11,9 +11,9 @@ const SplitService: React.FC = () => {
       <div className="mx-4 my-4">
         <Message
           className={"space-x-2"}
-          title={"Bundle"}
+          title={"Split"}
           content={
-            "This is a solution that allows users to combine multiple RWAs NFTs into a single package - a unique RWAs NFT which has an overall value equal to the sum of the individual RWA NFT's values. The purpose of this is to create a NFTs package and minimize the number of transactions that users need to make when using RWA NFTs in financial platforms. Furthermore, users can take the advantage of adjusting the number of NFTs used to generate the package and putting it into an RWA NFT Bundle."
+            "NFT Split is also a solution that enables users to divide their NFTs into several parts and use them in DeFi activities. For instance, if a user deposits 5 grams of gold into the vault, how can they use just one gram of gold for DeFi activities? NFT Split addresses this issue. When the user wants to reclaim the original RWA NFT, they can take it from the pieces that were split initially. As a result, this feature allows the user to retrieve the original NFT. "
           }
         />
       </div>
