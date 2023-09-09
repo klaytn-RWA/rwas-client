@@ -1,8 +1,11 @@
 import { CheckCircleFill } from "@styled-icons/bootstrap";
-import { waitForTransaction, writeContract } from "@wagmi/core";
+import { readContract, waitForTransaction, writeContract } from "@wagmi/core";
 import { ethers } from "ethers";
 import React, { useState } from "react";
+import { useAccount } from "wagmi";
+import abiTranscaAssetNFT from "../../abi/TranscaAssetNFT.json";
 import abiBundle from "../../abi/TranscaBundleNFT.json";
+import { transcaAsset, transcaBundle } from "../../config";
 import { setToast } from "../../redux/reducers/toastReducer";
 import { useAppDispatch } from "../../redux/store";
 import Button from "../Button/Button";
@@ -10,23 +13,26 @@ import Popup from "./Popup";
 import { usePopups } from "./PopupProvider";
 
 const PopupCreateBundle: React.FC<{ nfts: Array<any>; loadingData: boolean }> = ({ nfts, loadingData }) => {
-  const [acitves, setActives] = useState<Array<any>>([]);
+  console.log(nfts, 111);
+
+  const [selected, setActives] = useState<Array<any>>([]);
   const [minting, setMinting] = useState(false);
   const { removeAll } = usePopups();
   const dispatch = useAppDispatch();
+  const { address } = useAccount();
 
   const onSelectNFT = (id: number) => {
-    const ac = acitves!.filter((res) => id === res);
+    const ac = selected!.filter((res) => id === res);
     if (ac.length === 0) {
-      setActives([...acitves, id]);
+      setActives([...selected, id]);
     } else {
-      let temp = acitves.filter((res) => id !== res);
+      let temp = selected.filter((res) => id !== res);
       setActives(temp);
     }
   };
 
   const checkActive = (id: number) => {
-    const ac = acitves!.filter((res) => id === res);
+    const ac = selected!.filter((res) => id === res);
     if (ac.length > 0) {
       return true;
     }
@@ -60,58 +66,89 @@ const PopupCreateBundle: React.FC<{ nfts: Array<any>; loadingData: boolean }> = 
 
   const onHandleMintBundle = async () => {
     setMinting(true);
-    if (acitves.length === 0) {
-      dispatch(
-        setToast({
-          show: true,
-          title: "",
-          message: "Please select NFT to mint a bundle",
-          type: "info",
-        }),
-      );
+
+    if (selected.length === 0) {
+      dispatch(setToast({ show: true, title: "", message: "Please select NFT to mint a bundle", type: "info" }));
       setMinting(false);
+
       return;
     }
+
+    // await Promise.all(
+    //   selected.map(async (item) => {
+    const data = await readContract({
+      address: transcaAsset,
+      abi: abiTranscaAssetNFT,
+      functionName: "isApprovedForAll",
+      args: [address, transcaBundle],
+    });
+
+    if (!data) {
+      try {
+        const approveAllNFTs = await writeContract({
+          address: transcaAsset,
+          abi: abiTranscaAssetNFT,
+          functionName: "setApprovalForAll",
+          args: [transcaBundle, true],
+        });
+
+        const data = await waitForTransaction({ hash: approveAllNFTs.hash });
+        if (data.status === "reverted") {
+          console.log(data);
+          dispatch(
+            setToast({
+              show: true,
+              title: "",
+              message: "Approve failed",
+              type: "error",
+            }),
+          );
+
+          setMinting(false);
+          return;
+        }
+      } catch (error) {
+        console.error(error);
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Approve failed",
+            type: "error",
+          }),
+        );
+
+        setMinting(false);
+        return;
+      }
+    }
+    //   }),
+    // );
+
     const write = await writeContract({
       address: import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT! as any,
       abi: abiBundle,
       functionName: "deposit",
-      args: [acitves],
+      args: [selected],
     });
+
     if (write.hash) {
       const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: write.hash });
       if (waitTranscation.status === "success") {
-        dispatch(
-          setToast({
-            show: true,
-            title: "",
-            message: "Create bundle success",
-            type: "success",
-          }),
-        );
+        dispatch(setToast({ show: true, title: "", message: "Create bundle success", type: "success" }));
+
         setMinting(false);
         removeAll();
+
         return;
       } else {
-        dispatch(
-          setToast({
-            show: true,
-            title: "",
-            message: "Transcation wrong!",
-            type: "error",
-          }),
-        );
+        dispatch(setToast({ show: true, title: "", message: "Transcation wrong!", type: "error" }));
+
         return;
       }
     } else {
-      dispatch(
-        setToast({
-          show: true,
-          title: "",
-          message: "Something wrong!",
-          type: "error",
-        }),
-      );
+      dispatch(setToast({ show: true, title: "", message: "Something wrong!", type: "error" }));
+
       setMinting(false);
       return;
     }
@@ -162,7 +199,7 @@ const PopupCreateBundle: React.FC<{ nfts: Array<any>; loadingData: boolean }> = 
           Create Bundle
         </Button>
         <Button
-          className="!rounded-3xl text-black font-bold text-white min-w-[200px] leading-[21px]"
+          className="!rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
           type="reset"
           onClick={() => {
             removeAll();

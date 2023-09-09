@@ -1,5 +1,3 @@
-// Copyright (c) Fewcha. All rights reserved.
-
 import { SpinnerIos } from "@styled-icons/fluentui-system-regular";
 import React, { PropsWithChildren } from "react";
 import cn from "../../services/cn";

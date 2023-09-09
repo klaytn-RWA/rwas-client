@@ -1,11 +1,13 @@
-import { waitForTransaction, writeContract } from "@wagmi/core";
+import { readContract, waitForTransaction, writeContract } from "@wagmi/core";
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { ethers } from "ethers";
 import { useState } from "react";
-import { useContractReads } from "wagmi";
+import { useAccount, useContractReads } from "wagmi";
 import abiIntermediation from "../../abi/TranscaIntermediation.json";
+import abiUSDTSimulator from "../../abi/USDTSimulator.json";
+import { transcaIntermediation, usdt } from "../../config";
 import { Asset } from "../../redux/reducers/assetReducer";
 import { Bundle } from "../../redux/reducers/bundleReducer";
 import { getBorrowReqs, Intermediation } from "../../redux/reducers/intermediationReducer";
@@ -27,6 +29,7 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
   const [returnMoneyLoading, setReturnMoneyLoading] = useState(false);
   const [cancelBorrowRequestLoading, setCancelBorrowRequestLoading] = useState(false);
   const [claimNFTLoading, setClaimNFTLoading] = useState(false);
+  const { address } = useAccount();
 
   const dispatch = useAppDispatch();
 
@@ -41,12 +44,7 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
     }
   };
 
-  const {
-    data: contract,
-    isError: contractError,
-    isLoading: contractLoading,
-    isFetched: contractFetched,
-  } = useContractReads({
+  const { data: contract } = useContractReads({
     watch: true,
     contracts: [
       {
@@ -62,6 +60,55 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
 
   const onHandleReturnTheMoney = async () => {
     setReturnMoneyLoading(true);
+
+    const data = (await readContract({
+      address: usdt,
+      abi: abiUSDTSimulator,
+      functionName: "allowance",
+      args: [address, transcaIntermediation],
+    })) as bigint;
+
+    if (data < borrowReq.amount) {
+      if (!data) {
+        try {
+          const approve = await writeContract({
+            address: usdt,
+            abi: abiUSDTSimulator,
+            functionName: "approve",
+            args: [transcaIntermediation, borrowReq.amount],
+          });
+
+          const data = await waitForTransaction({ hash: approve.hash });
+          if (data.status === "reverted") {
+            console.log(data);
+            dispatch(
+              setToast({
+                show: true,
+                title: "",
+                message: "Approve failed",
+                type: "error",
+              }),
+            );
+
+            setReturnMoneyLoading(false);
+            return;
+          }
+        } catch (error) {
+          console.error(error);
+          dispatch(
+            setToast({
+              show: true,
+              title: "",
+              message: "Approve failed",
+              type: "error",
+            }),
+          );
+
+          setReturnMoneyLoading(false);
+          return;
+        }
+      }
+    }
 
     if (borrowReq.returned) {
       dispatch(

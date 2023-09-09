@@ -1,9 +1,11 @@
-import { waitForTransaction, writeContract } from "@wagmi/core";
+import { readContract, waitForTransaction, writeContract } from "@wagmi/core";
 import { ethers } from "ethers";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useAccount } from "wagmi";
+import abiTranscaAssetNFT from "../../abi/TranscaAssetNFT.json";
 import abiIntermadiation from "../../abi/TranscaIntermediation.json";
+import { transcaIntermediation } from "../../config";
 import { Asset, getAssets } from "../../redux/reducers/assetReducer";
 import { Bundle, getBundles } from "../../redux/reducers/bundleReducer";
 import { getBorrowReqs } from "../../redux/reducers/intermediationReducer";
@@ -19,6 +21,7 @@ import KanaSelectDropdown, { COINS_DATA } from "../Selector/RadixSelector";
 import BundleNFT from "./BundleNFT";
 import NFTCard from "./NFTCard";
 import NFTProperty from "./NFTProperty";
+
 type BrrowType = {
   loanAmount: string;
   minLoanAmount: string;
@@ -27,17 +30,17 @@ type BrrowType = {
 
 const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) => {
   const { addPopup } = usePopups();
+
   let totalOraklPrice = 0;
-  let image = "";
   let indentifierCode = "";
   let appraisalPrice = 0;
   let id = 0;
   let weight = 0;
   let isQuickRaise = false;
   let contract = "";
+
   if (asset) {
     totalOraklPrice = asset.oraklPrice;
-    image = asset.image;
     appraisalPrice = asset.appraisalPrice;
     id = asset.assetId;
     weight = asset.weight;
@@ -45,10 +48,11 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
     indentifierCode = asset.indentifierCode;
     contract = import.meta.env.VITE_TRANSCA_ASSET_CONTRACT! as any;
   }
+
   if (bundle) {
     totalOraklPrice = bundle.totalOraklValue;
     isQuickRaise = bundle.totalOraklValue > 0;
-    image = bundle.uri;
+
     let _weight = 0;
     let _appraisalPrice = 0;
     bundle.nfts.forEach((element) => {
@@ -65,8 +69,10 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
     addPopup({
       Component: () => {
         const [currentCoin, setCurrentCoin] = useState(COINS_DATA[0].address);
+
         const [loadingCreateBorrow, setLoadingCreateBorrow] = useState(false);
         const [loadingQuickBorrow, setLoadingQuickBorrow] = useState(false);
+
         const { address } = useAccount();
         const { removeAll } = usePopups();
         const dispatch = useAppDispatch();
@@ -74,8 +80,7 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
         const {
           register,
           handleSubmit,
-          setValue,
-          watch,
+
           formState: { errors },
         } = useForm<BrrowType>({
           mode: "onChange",
@@ -115,6 +120,14 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
 
             if (Number(values.minLoanAmount) < 0) {
               errors = { ...errors, ...resolverError("minLoanAmount", "required", "Amount must be more than 0") };
+
+              return { values, errors };
+            }
+
+            if (Number(values.minLoanAmount) > Number(values.loanAmount)) {
+              errors = { ...errors, ...resolverError("minLoanAmount", "required", "Min amount must be less than amount") };
+
+              return { values, errors };
             }
 
             if (!values.duration) {
@@ -131,6 +144,8 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
 
             if (Number(values.duration) < 0) {
               errors = { ...errors, ...resolverError("duration", "required", "Amount must be more than 0") };
+
+              return { values, errors };
             }
 
             return { values, errors };
@@ -143,6 +158,54 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
 
         const onHandleCreateBorrowReq = async (data: BrrowType) => {
           setLoadingCreateBorrow(true);
+
+          const approveData = await readContract({
+            address: contract as `0x${string}`,
+            abi: abiTranscaAssetNFT,
+            functionName: "isApprovedForAll",
+            args: [address, transcaIntermediation],
+          });
+
+          if (!approveData) {
+            try {
+              const approveAllNFTs = await writeContract({
+                address: contract as `0x${string}`,
+                abi: abiTranscaAssetNFT,
+                functionName: "setApprovalForAll",
+                args: [transcaIntermediation, true],
+              });
+
+              const data = await waitForTransaction({ hash: approveAllNFTs.hash });
+              if (data.status === "reverted") {
+                console.log(data);
+                dispatch(
+                  setToast({
+                    show: true,
+                    title: "",
+                    message: "Approve failed",
+                    type: "error",
+                  }),
+                );
+
+                setLoadingQuickBorrow(false);
+                return;
+              }
+            } catch (error) {
+              console.error(error);
+              dispatch(
+                setToast({
+                  show: true,
+                  title: "",
+                  message: "Approve failed",
+                  type: "error",
+                }),
+              );
+
+              setLoadingQuickBorrow(false);
+              return;
+            }
+          }
+
           const createBorrowReq = await writeContract({
             address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT! as any,
             abi: abiIntermadiation,
@@ -193,13 +256,64 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
 
         const onHandleQuickBorrow = async () => {
           setLoadingQuickBorrow(true);
+
+          const data = await readContract({
+            address: contract as `0x${string}`,
+            abi: abiTranscaAssetNFT,
+            functionName: "isApprovedForAll",
+            args: [address, transcaIntermediation],
+          });
+
+          if (!data) {
+            try {
+              const approveAllNFTs = await writeContract({
+                address: contract as `0x${string}`,
+                abi: abiTranscaAssetNFT,
+                functionName: "setApprovalForAll",
+                args: [transcaIntermediation, true],
+              });
+
+              const data = await waitForTransaction({ hash: approveAllNFTs.hash });
+              if (data.status === "reverted") {
+                console.log(data);
+                dispatch(
+                  setToast({
+                    show: true,
+                    title: "",
+                    message: "Approve failed",
+                    type: "error",
+                  }),
+                );
+
+                setLoadingQuickBorrow(false);
+                return;
+              }
+            } catch (error) {
+              console.error(error);
+              dispatch(
+                setToast({
+                  show: true,
+                  title: "",
+                  message: "Approve failed",
+                  type: "error",
+                }),
+              );
+
+              setLoadingQuickBorrow(false);
+              return;
+            }
+          }
+
           const createBorrowReq = await writeContract({
-            address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT! as any,
+            address: transcaIntermediation,
             abi: abiIntermadiation,
             functionName: "createQuickBorrow",
             args: [id, contract, ethers.BigNumber.from(100 * 60)],
           });
+
           if (createBorrowReq.hash) {
+            await waitForTransaction({ hash: createBorrowReq.hash });
+
             dispatch(
               setToast({
                 show: true,
@@ -208,9 +322,11 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
                 type: "success",
               }),
             );
+
             dispatch(getAssets({ address: address! }));
             dispatch(getBundles({ address: address! }));
             setLoadingQuickBorrow(false);
+
             removeAll();
           } else {
             dispatch(
@@ -221,13 +337,14 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
                 type: "error",
               }),
             );
+
             setLoadingQuickBorrow(false);
           }
         };
 
         return (
           <Popup className="bg-gray-50 min-w-[800px] min-h-[700px]">
-            <h1 className="mb-4 text-center font-bold text-[20px]">Create Borrow</h1>
+            <h1 className="mb-4 text-center font-bold text-[20px]">Create Borrow Request</h1>
             <form onSubmit={handleSubmit(onSubmit)} className="flex justify-center  space-x-2">
               <div className="h-full w-1/2 shadow-xl border border-none rounded-xl p-2 bg-white">
                 <div className="">
@@ -241,7 +358,7 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
                   <div>
                     <div className="font-bold text-[14px] m-2">Properties</div>
                     {asset && (
-                      <div className="m-2">
+                      <div className="mb-2">
                         <NFTProperty title="code" content={indentifierCode!} />
                       </div>
                     )}
@@ -254,7 +371,7 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
                     </div>
                   </div>
                   {isQuickRaise && (
-                    <div className="my-4">
+                    <div className="mt-4">
                       <div className={`bg-green-100 border-green-500 w-fit  border  rounded-2xl text-green-700 px-4 py-3`} role="alert">
                         <p className="font-bold text-[13px]">Quick Raise:</p>{" "}
                         <p className="text-[13px]">{`Your #${id} is in High Liquidity Class, Transca will be fund for your NFT`}</p>
@@ -263,7 +380,7 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
                   )}
                 </div>
               </div>
-              <div className="w-1/2 bg-blue-200 px-6 bg-white border border-none rounded-xl shadow-xl">
+              <div className="w-1/2 px-6 bg-white border border-none rounded-xl shadow-xl">
                 {/* Loan Amount */}
                 <div className="py-4">
                   <div className="text-[16px] font-bold">Loan Amount</div>
@@ -294,9 +411,10 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
                   </div>
                   <div className="text-red-500">{errors.loanAmount?.message}</div>
                 </div>
+
                 {/* Loan Interest */}
                 <div className="py-4">
-                  <div className="text-[16px] font-bold">Mint Loan Amount</div>
+                  <div className="text-[16px] font-bold">Min Loan Amount</div>
                   <div className="text-[13px]">Enter the lowest price you can accept to borrow</div>
 
                   <div className="max-w-[400px] flex justify-between items-center border rounded-xl my-2">
@@ -324,6 +442,7 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
                   </div>
                   <div className="text-red-500">{errors.minLoanAmount?.message}</div>
                 </div>
+
                 {/* Loan Duration */}
                 <div className="py-4">
                   <div className="text-[16px] font-bold">Loan Duration</div>
@@ -346,7 +465,6 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
                 <div className="flex flex-col justify-center items-center space-y-2 my-8">
                   <Button
                     className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white w-[300px] leading-[21px]"
-                    // onClick={() => onHandleCreateBorrowReq()}
                     loading={loadingCreateBorrow}
                     type="submit"
                   >
@@ -373,7 +491,7 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
   if (!asset && !bundle) return;
 
   return (
-    <div className="p-2 border border-2 rounded-xl cursor-pointer shadow-2xl" onClick={() => onOpenPopup()}>
+    <div className="p-2 border rounded-xl cursor-pointer shadow-md" onClick={() => onOpenPopup()}>
       <div className="flex justify-center items-center">
         {asset && <NFTCard nftData={asset} />}
         {bundle && <BundleNFT bundle={bundle} />}

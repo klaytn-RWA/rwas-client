@@ -1,9 +1,7 @@
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ArrowBack } from "@styled-icons/boxicons-regular";
 import { useEffect } from "react";
 import { useAccount } from "wagmi";
-import {} from "../../../../public/icons/diamond1.png";
-
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { getAssets, selectAsset } from "../../../redux/reducers/assetReducer";
 import { getBundles, selectBundle } from "../../../redux/reducers/bundleReducer";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
@@ -11,6 +9,8 @@ import Header from "../../Header/Header";
 import BundleNFT from "../../NFT/BundleNFT";
 import NFTCard from "../../NFT/NFTCard";
 import SearchInput from "../../Search/SearchInput";
+
+console.log(import.meta.env);
 
 const Portfolio: React.FC<{}> = () => {
   const dispatch = useAppDispatch();
@@ -22,7 +22,7 @@ const Portfolio: React.FC<{}> = () => {
   useEffect(() => {
     dispatch(getAssets({ address: address! }));
     dispatch(getBundles({ address: address! }));
-  }, []);
+  }, [address, dispatch]);
 
   const onShowNFTs = () => {
     let temp: Array<any> = [];

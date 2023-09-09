@@ -21,7 +21,7 @@ const Borrow: React.FC<{}> = () => {
   useEffect(() => {
     dispatch(getAssets({ address: address! }));
     dispatch(getBundles({ address: address! }));
-  }, []);
+  }, [address, dispatch]);
 
   const onShowNFTs = () => {
     let nfts: Array<any> = [];
@@ -38,29 +38,31 @@ const Borrow: React.FC<{}> = () => {
 
   const onShowBundleNFTs = () => {
     let temp: Array<any> = [];
+
     if (bundleRx.bundles.length > 0 && !bundleRx.loading) {
       temp = bundleRx.bundles.map((e, i) => {
         return <NFTBorrowItem key={i} bundle={e} />;
       });
     }
+
     if (temp.length > 0) {
       return temp;
     }
+
     return null;
   };
 
   return (
-    <div className="">
+    <>
       <Header />
-      <div className="p-4 md:ml-64 mt-14 bg-gray-100 h-screen">
+      <div className="p-4 md:ml-64 pt-20 bg-gray-100 h-screen">
         <div className="flex space-x-2 items-center">
           <h2 className="w-fit bg-white border border-none rounded-xl px-6 py-1 my-4 flex justify-center items-center space-x-2 cursor-pointer">
             <ArrowBack size={24} />
             <div className="text-[18px] font-bold">Borrow</div>
           </h2>
-          <div className="mb-2">
-            <Message className="bg-blue-100 border-blue-500" title="Borrow a fund" content="Assets you own. Pick one for create a borrow request!" />
-          </div>
+
+          <Message className="bg-blue-100 border-blue-500" title="Borrow a fund" content="Assets you own. Pick one for create a borrow request!" />
         </div>
 
         <div className="flex flex-col lg:flex-row justify-center space-y-4 lg:space-x-4 lg:space-y-0 mt-4">
@@ -89,7 +91,8 @@ const Borrow: React.FC<{}> = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
+
 export default Borrow;

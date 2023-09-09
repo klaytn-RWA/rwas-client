@@ -7,7 +7,7 @@ const History: React.FC<{}> = () => {
   return (
     <div>
       <Header />
-      <div className="p-4 md:ml-64 mt-14 bg-gray-100 h-screen">
+      <div className="p-4 md:ml-64 pt-20 bg-gray-100 h-screen">
         <div className="flex space-x-2 items-center">
           <h2 className="w-fit bg-white border border-none rounded-xl px-6 py-1 my-4 flex justify-center items-center space-x-2 cursor-pointer">
             <ArrowBack size={24} />

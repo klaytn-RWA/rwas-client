@@ -1,5 +1,3 @@
-// Copyright (c) Fewcha. All rights reserved.
-
 import { useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";
 import cn from "../../services/cn";
@@ -13,7 +11,6 @@ export type KanaCoin = {
 };
 
 export const COINS_DATA: Array<KanaCoin> = [
-  // { address: "7s200", decimals: 18, logoURI: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png", name: "Bitcoin", symbol: "BTC" },
   { address: "7s201", decimals: 8, logoURI: "https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/512/Tether-USDT-icon.png", name: "Tether", symbol: "USDT" },
 ];
 

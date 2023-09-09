@@ -4,6 +4,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { useContractReads } from "wagmi";
+import abiIntermediation from "../../../abi/TranscaIntermediation.json";
 import { Asset, getAssetDetail } from "../../../redux/reducers/assetReducer";
 import { Bundle, getBundleDetail } from "../../../redux/reducers/bundleReducer";
 import { Intermediation } from "../../../redux/reducers/intermediationReducer";
@@ -11,25 +12,19 @@ import { useAppDispatch } from "../../../redux/store";
 import PopupHistoryDetail from "../../Popup/PopupHistoryDetail";
 import { usePopups } from "../../Popup/PopupProvider";
 
-import abiIntermediation from "../../../abi/TranscaIntermediation.json";
-
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 dayjs().format("lll");
 
 export const HistoryItem: React.FC<{ data: Intermediation; actionType: string }> = ({ data, actionType }) => {
+  console.log(data, 111);
   const [asset, setAsset] = useState<Asset>();
   const [bundle, setBundle] = useState<Bundle>();
 
   const dispatch = useAppDispatch();
   const { addPopup } = usePopups();
 
-  const {
-    data: contract,
-    isError: contractError,
-    isLoading: contractLoading,
-    isFetched: contractFetched,
-  } = useContractReads({
+  const { data: contract } = useContractReads({
     watch: true,
     contracts: [
       {
@@ -60,6 +55,7 @@ export const HistoryItem: React.FC<{ data: Intermediation; actionType: string }>
         }),
       );
     }
+
     if (data.nftAddress === import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT!) {
       dispatch(
         getBundleDetail({
@@ -72,7 +68,7 @@ export const HistoryItem: React.FC<{ data: Intermediation; actionType: string }>
         }),
       );
     }
-  }, []);
+  }, [data.nftAddress, data.nftId, dispatch]);
 
   const onHandleOpenPopUp = () => {
     addPopup({
@@ -120,15 +116,15 @@ export const HistoryItem: React.FC<{ data: Intermediation; actionType: string }>
       )}
 
       {!data.returned && data.lendOfferReqId > 0 && !isExpireLendCanClaimNFT && (
-        <div className="flex flex-col justify-end items-end">
-          <div className="text-[14px] font-semibold">Expire Loan</div>
+        <div className="flex flex-col justify-end">
+          <div className="text-[14px] font-semibold">Expired Time:</div>
 
-          {/* <div className="text-[13px] text-gray-600 leading-[16px]">{new Date(Number(duration) * 1000).getDate()}</div> */}
-          <div className="text-[13px] text-gray-600 leading-[16px]">
+          <div className="text-[13px] text-gray-600 leading-[16px] mb-4">
             {dayjs(Number(duration) * 1000)
               .add(data.duration, "minutes")
               .toString()}
           </div>
+
           <div className="text-[14px] bg-[#413c69] px-2 text-center text-white font-bold border border-none rounded-xl">{Number(data.duration)} min(s)</div>
         </div>
       )}

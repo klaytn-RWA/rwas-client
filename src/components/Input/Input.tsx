@@ -1,5 +1,3 @@
-// Copyright (c) Fewcha. All rights reserved.
-
 import React, { forwardRef } from "react";
 import cn from "../../services/cn";
 

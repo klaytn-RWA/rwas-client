@@ -1,12 +1,10 @@
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
-
 import "../../styles/main.scss";
-
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import PopupProvider from "../Popup/PopupProvider";
 import Toast from "../Toast/toast";
 import Borrow from "./Borrow";

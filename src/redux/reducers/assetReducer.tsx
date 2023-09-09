@@ -28,6 +28,7 @@ export const getAssets = createAsyncThunk("asset/get", async ({ address }: { add
       functionName: "getAllAssetByUser",
       args: [address],
     });
+
     if (!listAsset || (listAsset as Array<Asset>).length === 0) {
       return [];
     } else {
@@ -57,6 +58,7 @@ export const getAssets = createAsyncThunk("asset/get", async ({ address }: { add
       return list;
     }
   } catch (error: any) {
+    console.error(error);
     return [];
   }
 });

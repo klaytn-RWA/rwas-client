@@ -21,7 +21,7 @@ const BundleService: React.FC = () => {
         const assetRx = useAppSelector(selectAsset);
         useEffect(() => {
           dispatch(getAssets({ address: address! }));
-        }, []);
+        }, [dispatch]);
 
         return <PopupCreateBundle nfts={assetRx.assets} loadingData={assetRx.loading} />;
       },
@@ -35,7 +35,7 @@ const BundleService: React.FC = () => {
         const bundleRx = useAppSelector(selectBundle);
         useEffect(() => {
           dispatch(getBundles({ address: address! }));
-        }, []);
+        }, [dispatch]);
         return <PopupUnpackBundle bundles={bundleRx.bundles} loadingData={bundleRx.loading} />;
       },
     });

@@ -1,9 +1,11 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { waitForTransaction, writeContract } from "@wagmi/core";
+import { readContract, waitForTransaction, writeContract } from "@wagmi/core";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import abiIntermadiation from "../../abi/TranscaIntermediation.json";
+import abiUSDTSimulator from "../../abi/USDTSimulator.json";
+import { transcaIntermediation, usdt } from "../../config";
 import { Asset, getAssetDetail } from "../../redux/reducers/assetReducer";
 import { Bundle, getBundleDetail } from "../../redux/reducers/bundleReducer";
 import { getBorrowReqs, Intermediation } from "../../redux/reducers/intermediationReducer";
@@ -45,10 +47,60 @@ const NFTLendItem: React.FC<{ borrowReq: Intermediation }> = ({ borrowReq }) => 
         }),
       );
     }
-  }, []);
+  }, [borrowReq.nftAddress, borrowReq.nftId, dispatch]);
 
   const onHandleLend = async () => {
     setLendLoading(true);
+
+    const data = (await readContract({
+      address: usdt,
+      abi: abiUSDTSimulator,
+      functionName: "allowance",
+      args: [address, transcaIntermediation],
+    })) as bigint;
+
+    if (data < borrowReq.amount) {
+      if (!data) {
+        try {
+          const approve = await writeContract({
+            address: usdt,
+            abi: abiUSDTSimulator,
+            functionName: "approve",
+            args: [transcaIntermediation, borrowReq.amount],
+          });
+
+          const data = await waitForTransaction({ hash: approve.hash });
+          if (data.status === "reverted") {
+            console.log(data);
+            dispatch(
+              setToast({
+                show: true,
+                title: "",
+                message: "Approve failed",
+                type: "error",
+              }),
+            );
+
+            setLendLoading(false);
+            return;
+          }
+        } catch (error) {
+          console.error(error);
+          dispatch(
+            setToast({
+              show: true,
+              title: "",
+              message: "Approve failed",
+              type: "error",
+            }),
+          );
+
+          setLendLoading(false);
+          return;
+        }
+      }
+    }
+
     if (borrowReq.creator === address) {
       dispatch(
         setToast({
@@ -111,7 +163,7 @@ const NFTLendItem: React.FC<{ borrowReq: Intermediation }> = ({ borrowReq }) => 
   };
 
   return (
-    <div className="px-2 border border shadow-xl rounded-xl m-4">
+    <div className="px-2 border shadow-xl rounded-xl m-4">
       {asset && (
         <div className="flex justify-center items-center">
           <NFTCard nftData={asset} />

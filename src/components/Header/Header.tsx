@@ -1,12 +1,10 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { History } from "@styled-icons/boxicons-regular";
 import { ExchangeFunds } from "@styled-icons/remix-fill";
 import { HandCoin } from "@styled-icons/remix-line";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { History } from "@styled-icons/boxicons-regular";
-
-import NFT_ICON from "../../../public/icons/card.png";
 const Header: React.FC<{}> = () => {
   const [isOpenMobileMenu, setIsOpenMobileMenu] = useState(false);
   const menuBackgroundService = useRef<HTMLDivElement | null>(null);
@@ -104,7 +102,7 @@ const Header: React.FC<{}> = () => {
                 }}
                 className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100  group ${data.pathname === "/nft-service" && "bg-gray-100"}`}
               >
-                <img src={NFT_ICON} className="h-[24px] w-[24px]" />
+                <img src="/icons/card.png" className="h-[24px] w-[24px]" alt="" />
                 <span className="ml-3">NFTs Service</span>
               </div>
             </li>
