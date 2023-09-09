@@ -1,11 +1,15 @@
 import { ArrowBack } from "@styled-icons/boxicons-regular";
 import { useEffect } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useContractReads } from "wagmi";
 import {} from "../../../../public/icons/diamond1.png";
+import abiAsset from "../../../abi/TranscaAssetNFT.json";
+import abiBundle from "../../../abi/TranscaBundleNFT.json";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ethers } from "ethers";
 import { getAssets, selectAsset } from "../../../redux/reducers/assetReducer";
 import { getBundles, selectBundle } from "../../../redux/reducers/bundleReducer";
+import { getBorrowReqs, selectIntermediation } from "../../../redux/reducers/intermediationReducer";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import Header from "../../Header/Header";
 import BundleNFT from "../../NFT/BundleNFT";
@@ -18,11 +22,42 @@ const Portfolio: React.FC<{}> = () => {
 
   const assetRx = useAppSelector(selectAsset);
   const bundleRx = useAppSelector(selectBundle);
+  const intermediationRx = useAppSelector(selectIntermediation);
 
   useEffect(() => {
     dispatch(getAssets({ address: address! }));
     dispatch(getBundles({ address: address! }));
+    dispatch(getBorrowReqs({}));
   }, []);
+
+  // TO-DO counter asset,bundle, all-borrow-balance
+  const {
+    data: contract,
+    isError: contractError,
+    isLoading: contractLoading,
+    isFetched: contractFetched,
+  } = useContractReads({
+    watch: true,
+    contracts: [
+      {
+        address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT! as any,
+        abi: abiAsset as any,
+        functionName: "assetId",
+        args: [],
+      },
+      {
+        address: import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT! as any,
+        abi: abiBundle as any,
+        functionName: "bundleId",
+        args: [],
+      },
+    ],
+  });
+
+  console.log("7s200:contract:", contract);
+
+  const assetIds = (contract as any)?.[0].result;
+  const bundleIds = (contract as any)?.[1].result;
 
   const onShowNFTs = () => {
     let temp: Array<any> = [];
@@ -50,6 +85,18 @@ const Portfolio: React.FC<{}> = () => {
     return null;
   };
 
+  const onGetTotalLoanPaid = () => {
+    let total = 0;
+    if (!intermediationRx.loading && intermediationRx.allBorrowReqs.length > 0) {
+      intermediationRx.allBorrowReqs.forEach((element) => {
+        if (element.borrowedAt > 0 && element.lendOfferReqId > 0) {
+          total = total + element.amount;
+        }
+      });
+    }
+    return total.toString();
+  };
+
   return (
     <>
       <Header />
@@ -58,34 +105,40 @@ const Portfolio: React.FC<{}> = () => {
           <ArrowBack size={24} />
           <div className="text-[18px] font-bold">Portfolio</div>
         </h2>
-        <div className="py-2 border border-none rounded-xl my-4 flex space-x-4">
-          <div className="flex justify-between items-center space-x-2 w-[300px] bg-white drop-shadow-xl px-4 py-4 border border-none rounded-xl">
-            <div className="text-[20px]">
-              <div className="text-[16px] font-normal">Total vault RWAs NFT</div>
-              <div className="font-bold">200$</div>
+        <div className="py-2 border border-none rounded-xl my-4 flex flex-col space-y-4 lg:space-x-4 lg:space-y-0 lg:flex-row">
+          <div className="flex flex-col space-y-4 md:space-x-4 md:space-y-0 md:flex-row">
+            <div className="flex justify-between items-center space-x-2 w-[400px] bg-white drop-shadow-xl px-4 py-4 border border-none rounded-xl">
+              <div className="text-[20px]">
+                <div className="text-[16px] font-normal">Total vault RWAs NFT</div>
+                <div className="font-bold">{Number(assetIds) >= 0 ? Number(assetIds) : 0}</div>
+              </div>
+              <img className="max-w-[90px] max-h-[90px]" src="/icons/bundleNFT.webp" alt="nft" />
             </div>
-            <img className="max-w-[50px] max-h-[50px]" src="/icons/wallet.png" alt="wallet" />
+            <div className="flex justify-between items-center space-x-2 w-[400px] bg-white drop-shadow-xl px-4 py-4 border border-none rounded-xl">
+              <div className="text-[20px]">
+                <div className="text-[16px] font-normal">Total bundle RWAs NFT</div>
+                <div className="font-bold">{Number(bundleIds) >= 0 ? Number(bundleIds) : 0}</div>
+              </div>
+              <img className="max-w-[90px] max-h-[90px]" src="/icons/nft-box.png" alt="bundle" />
+            </div>
           </div>
-          <div className="flex justify-between items-center space-x-2 w-[300px] bg-white drop-shadow-xl px-4 py-4 border border-none rounded-xl">
-            <div className="text-[20px]">
-              <div className="text-[16px] font-normal">Total staking RWAs NFT</div>
-              <div className="font-bold">200$</div>
+          <div className="flex space-x-4">
+            <div className="flex justify-between items-center space-x-2 w-[400px] bg-white drop-shadow-xl px-4 py-4 border border-none rounded-xl">
+              <div className="text-[20px]">
+                <div className="text-[16px] font-normal">Total Loan Paid</div>
+                <div className="font-bold">{ethers.utils.formatUnits(onGetTotalLoanPaid())}$</div>
+              </div>
+              {/* <ExchangeFunds size={60} /> */}
+
+              <img className="max-w-[80px] max-h-[80px]" src="/icons/lending.png" alt="wallet" />
             </div>
-            <img className="max-w-[50px] max-h-[50px]" src="/icons/wallet.png" alt="wallet" />
-          </div>
-          <div className="flex justify-between items-center space-x-2 w-[300px] bg-white drop-shadow-xl px-4 py-4 border border-none rounded-xl">
-            <div className="text-[20px]">
-              <div className="text-[16px] font-normal">Total lending RWAs NFT</div>
-              <div className="font-bold">200$</div>
-            </div>
-            <img className="max-w-[50px] max-h-[50px]" src="/icons/wallet.png" alt="wallet" />
-          </div>
-          <div className="flex justify-between items-center space-x-2 w-[300px] bg-white drop-shadow-xl px-4 py-4 border border-none rounded-xl">
-            <div className="text-[20px]">
-              <div className="text-[16px] font-normal">Total fund</div>
-              <div className="font-bold">200$</div>
-            </div>
-            <img className="max-w-[50px] max-h-[50px]" src="/icons/wallet.png" alt="wallet" />
+            {/* <div className="flex justify-between items-center space-x-2 w-[300px] bg-white drop-shadow-xl px-4 py-4 border border-none rounded-xl">
+              <div className="text-[20px]">
+                <div className="text-[16px] font-normal">Total fund</div>
+                <div className="font-bold">200$</div>
+              </div>
+              <img className="max-w-[50px] max-h-[50px]" src="/icons/wallet.png" alt="wallet" />
+            </div> */}
           </div>
         </div>
         <div>
