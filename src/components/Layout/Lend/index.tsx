@@ -1,5 +1,6 @@
 import { ArrowBack } from "@styled-icons/boxicons-regular";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { getBorrowReqs, selectIntermediation } from "../../../redux/reducers/intermediationReducer";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import Header from "../../Header/Header";
@@ -9,6 +10,7 @@ import SearchInput from "../../Search/SearchInput";
 const Lend: React.FC<{}> = () => {
   const dispatch = useAppDispatch();
   const intermediationRx = useAppSelector(selectIntermediation);
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getBorrowReqs({}));
@@ -33,7 +35,7 @@ const Lend: React.FC<{}> = () => {
     <>
       <Header />
       <div className="p-4 md:ml-64 pt-20 bg-gray-100 h-screen">
-        <h2 className="w-fit bg-white border border-none rounded-xl px-6 py-1 my-4 flex justify-center items-center space-x-2 cursor-pointer">
+        <h2 className="w-fit bg-white border border-none rounded-xl px-6 py-1 my-4 flex justify-center items-center space-x-2 cursor-pointer" onClick={() => navigate("/")}>
           <ArrowBack size={24} />
           <div className="text-[18px] font-bold">Lend</div>
         </h2>

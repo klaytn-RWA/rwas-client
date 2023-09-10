@@ -1,6 +1,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ArrowBack } from "@styled-icons/boxicons-regular";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAccount } from "wagmi";
 import { getAssets, selectAsset } from "../../../redux/reducers/assetReducer";
 import { getBundles, selectBundle } from "../../../redux/reducers/bundleReducer";
@@ -14,6 +15,7 @@ import BorrowHistory from "../History/BorrowHistory";
 const Borrow: React.FC<{}> = () => {
   const dispatch = useAppDispatch();
   const { address, isConnected } = useAccount();
+  const navigate = useNavigate();
 
   const assetRx = useAppSelector(selectAsset);
   const bundleRx = useAppSelector(selectBundle);
@@ -57,7 +59,7 @@ const Borrow: React.FC<{}> = () => {
       <Header />
       <div className="p-4 md:ml-64 pt-20 bg-gray-100 h-screen">
         <div className="flex space-x-2 items-center">
-          <h2 className="w-fit bg-white border border-none rounded-xl px-6 py-1 my-4 flex justify-center items-center space-x-2 cursor-pointer">
+          <h2 className="w-fit bg-white border border-none rounded-xl px-6 py-1 my-4 flex justify-center items-center space-x-2 cursor-pointer" onClick={() => navigate("/")}>
             <ArrowBack size={24} />
             <div className="text-[18px] font-bold">Borrow</div>
           </h2>

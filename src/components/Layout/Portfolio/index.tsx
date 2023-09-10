@@ -1,5 +1,4 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { ArrowBack } from "@styled-icons/boxicons-regular";
 import { ethers } from "ethers";
 import { useEffect } from "react";
 import { useAccount, useContractReads } from "wagmi";
@@ -100,10 +99,10 @@ const Portfolio: React.FC<{}> = () => {
     <>
       <Header />
       <div className="p-4 md:ml-64 mt-14 bg-gray-100 h-screen">
-        <h2 className="w-fit bg-white border border-none rounded-xl px-6 py-1 my-4 flex justify-center items-center space-x-2 cursor-pointer">
+        {/* <h2 className="w-fit bg-white border border-none rounded-xl px-6 py-1 my-4 flex justify-center items-center space-x-2 cursor-pointer">
           <ArrowBack size={24} />
           <div className="text-[18px] font-bold">Portfolio</div>
-        </h2>
+        </h2> */}
         <div className="py-2 border border-none rounded-xl my-4 flex flex-col space-y-4 lg:space-x-4 lg:space-y-0 lg:flex-row">
           <div className="flex flex-col space-y-4 md:space-x-4 md:space-y-0 md:flex-row">
             <div className="flex justify-between items-center space-x-2 w-[400px] bg-white drop-shadow-xl px-4 py-4 border border-none rounded-xl">

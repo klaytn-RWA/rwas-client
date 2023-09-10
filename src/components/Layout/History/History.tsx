@@ -1,15 +1,17 @@
 import { ArrowBack } from "@styled-icons/boxicons-regular/ArrowBack";
+import { useNavigate } from "react-router-dom";
 import Header from "../../Header/Header";
 import BorrowHistory from "./BorrowHistory";
 import LendHistory from "./LendHistory";
 
 const History: React.FC<{}> = () => {
+  const navigate = useNavigate();
   return (
     <div>
       <Header />
       <div className="p-4 md:ml-64 pt-20 bg-gray-100 h-screen">
         <div className="flex space-x-2 items-center">
-          <h2 className="w-fit bg-white border border-none rounded-xl px-6 py-1 my-4 flex justify-center items-center space-x-2 cursor-pointer">
+          <h2 className="w-fit bg-white border border-none rounded-xl px-6 py-1 my-4 flex justify-center items-center space-x-2 cursor-pointer" onClick={() => navigate("/")}>
             <ArrowBack size={24} />
             <div className="text-[18px] font-bold">History</div>
           </h2>
