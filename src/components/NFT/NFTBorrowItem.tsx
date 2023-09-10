@@ -458,7 +458,7 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
                 {/* Loan Duration */}
                 <div className="py-4">
                   <div className="text-[16px] font-bold">Loan Duration</div>
-                  <div className="text-[13px]">Enter the duration of the loan. You can toggle between hours and days</div>
+                  <div className="text-[13px]">Loan duration is calculated based on minutes</div>
                   <div className="max-w-[400px] flex justify-between items-center border rounded-xl my-2">
                     <div className="px-2">
                       <Input

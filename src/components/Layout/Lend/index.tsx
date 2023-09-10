@@ -19,7 +19,7 @@ const Lend: React.FC<{}> = () => {
     if (!intermediationRx.loading && intermediationRx.allBorrowReqs) {
       intermediationRx.allBorrowReqs.forEach((e, i) => {
         if (!e.borrowedAt && e.amount > 0) {
-          temp.push(<NFTLendItem borrowReq={e} />);
+          temp.push(<NFTLendItem borrowReq={e} key={i} />);
         }
       });
     }
@@ -56,7 +56,7 @@ const Lend: React.FC<{}> = () => {
               </select>
             </div>
           </div>
-          {!onHandleShowBorrowReqs() && !intermediationRx.loading ? (
+          {!onHandleShowBorrowReqs() ? (
             <div className="text-center flex justify-center items-center  border border-none rounded-xl min-h-[600px] bg-white my-4 font-bold">Empty</div>
           ) : (
             <div className="flex jusitfy-center items-center flex-wrap bg-white my-4 border border-none rounded-xl">{onHandleShowBorrowReqs()}</div>
