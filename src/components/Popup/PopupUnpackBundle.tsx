@@ -1,7 +1,10 @@
 import { CheckCircleFill } from "@styled-icons/bootstrap";
 import { waitForTransaction, writeContract } from "@wagmi/core";
 import React, { useState } from "react";
+import { useAccount } from "wagmi";
 import abiBundle from "../../abi/TranscaBundleNFT.json";
+import { getAssets } from "../../redux/reducers/assetReducer";
+import { getBundles } from "../../redux/reducers/bundleReducer";
 import { setToast } from "../../redux/reducers/toastReducer";
 import { useAppDispatch } from "../../redux/store";
 import Button from "../Button/Button";
@@ -11,6 +14,8 @@ import { usePopups } from "./PopupProvider";
 const PopupUnpackBundle: React.FC<{ bundles: Array<any>; loadingData: boolean }> = ({ bundles, loadingData }) => {
   const [activeBundle, setActiveBundle] = useState<Number | null>(null);
   const [unPacking, setUnpacking] = useState(false);
+
+  const { address } = useAccount();
 
   const dispatch = useAppDispatch();
   const { removeAll } = usePopups();
@@ -83,6 +88,8 @@ const PopupUnpackBundle: React.FC<{ bundles: Array<any>; loadingData: boolean }>
             type: "success",
           }),
         );
+        dispatch(getAssets({ address: address! }));
+        dispatch(getBundles({ address: address! }));
         setUnpacking(false);
         removeAll();
         return;

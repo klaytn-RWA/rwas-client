@@ -2,6 +2,7 @@ import { readContract, waitForTransaction, writeContract } from "@wagmi/core";
 import { ethers } from "ethers";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { useAccount } from "wagmi";
 import abiTranscaAssetNFT from "../../abi/TranscaAssetNFT.json";
 import abiIntermadiation from "../../abi/TranscaIntermediation.json";
@@ -30,6 +31,7 @@ type BrrowType = {
 
 const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bundle }) => {
   const { addPopup } = usePopups();
+  const navigate = useNavigate();
 
   let totalOraklPrice = 0;
   let indentifierCode = "";
@@ -38,6 +40,8 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
   let weight = 0;
   let isQuickRaise = false;
   let contract = "";
+
+  let ounceGold = 0;
 
   if (asset) {
     totalOraklPrice = asset.oraklPrice;
@@ -55,11 +59,16 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
 
     let _weight = 0;
     let _appraisalPrice = 0;
+    let _ounceGold = 0;
     bundle.nfts.forEach((element) => {
+      if (Number(element.assetType) === 0) {
+        _ounceGold += Number(element.weight);
+      }
       _weight += Number(element.weight);
       _appraisalPrice += Number(element.appraisalPrice);
     });
     weight = _weight;
+    ounceGold = _ounceGold;
     appraisalPrice = _appraisalPrice;
     id = bundle.id;
     contract = import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT! as any;
@@ -227,6 +236,7 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
               dispatch(getBundles({ address: address! }));
               dispatch(getBorrowReqs({}));
               setLoadingCreateBorrow(false);
+              navigate("/history");
               removeAll();
               return;
             } else {
@@ -325,8 +335,9 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
 
             dispatch(getAssets({ address: address! }));
             dispatch(getBundles({ address: address! }));
+            dispatch(getBorrowReqs({}));
             setLoadingQuickBorrow(false);
-
+            navigate("/history");
             removeAll();
           } else {
             dispatch(
@@ -363,11 +374,12 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
                       </div>
                     )}
                     <div className="grid grid-cols-2 gap-2">
-                      <NFTProperty title="weight" content={`${Number(ethers.utils.formatUnits(weight, 10)).toString()} ${isQuickRaise ? "ounce" : "gram"}`} />
+                      <NFTProperty title="weight" content={`${Number(ethers.utils.formatUnits(weight, 10)).toString()} gram`} />
                       {asset?.assetType === 0 ||
                         (bundle?.totalOraklValue && (
                           <NFTProperty title="Total gold value" content={`${Number(ethers.utils.formatEther(asset ? asset.oraklPrice : bundle.totalOraklValue)).toFixed(2)}$`} />
                         ))}
+                      {bundle && ounceGold > 0 && <NFTProperty title="Gold" content={`${Number(ethers.utils.formatUnits(ounceGold, 10)).toString()} ounce`} />}
                     </div>
                   </div>
                   {isQuickRaise && (
@@ -512,9 +524,7 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
         )}
         <div className="flex space-x-1">
           <div className="text-gray-900 text-[13px]">Weight:</div>
-          <div className="font-semibold text-[14px]">
-            {Number(ethers.utils.formatUnits(weight, 10)).toString()} {isQuickRaise ? "ounce" : "gram"}
-          </div>
+          <div className="font-semibold text-[14px]">{Number(ethers.utils.formatUnits(weight, 10)).toString()} gram</div>
         </div>
         {isQuickRaise && <div className="px-6 bg-green-700 font-bold text-white text-center border border-none rounded-2xl w-fit">Quick Raise</div>}
       </div>

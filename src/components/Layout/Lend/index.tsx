@@ -15,15 +15,18 @@ const Lend: React.FC<{}> = () => {
   }, []);
 
   const onHandleShowBorrowReqs = () => {
-    let temp = null;
+    let temp: Array<any> = [];
     if (!intermediationRx.loading && intermediationRx.allBorrowReqs) {
-      temp = intermediationRx.allBorrowReqs.map((e, i) => {
+      intermediationRx.allBorrowReqs.forEach((e, i) => {
         if (!e.borrowedAt && e.amount > 0) {
-          return <NFTLendItem borrowReq={e} />;
+          temp.push(<NFTLendItem borrowReq={e} />);
         }
       });
     }
-    return temp;
+    if (temp.length > 0) {
+      return temp;
+    }
+    return null;
   };
 
   return (
@@ -53,7 +56,11 @@ const Lend: React.FC<{}> = () => {
               </select>
             </div>
           </div>
-          <div className="flex jusitfy-center items-center flex-wrap bg-white my-4 border border-none rounded-xl">{onHandleShowBorrowReqs()}</div>
+          {!onHandleShowBorrowReqs() && !intermediationRx.loading ? (
+            <div className="text-center flex justify-center items-center  border border-none rounded-xl min-h-[600px] bg-white my-4 font-bold">Empty</div>
+          ) : (
+            <div className="flex jusitfy-center items-center flex-wrap bg-white my-4 border border-none rounded-xl">{onHandleShowBorrowReqs()}</div>
+          )}
         </div>
       </div>
     </>

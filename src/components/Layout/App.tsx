@@ -1,6 +1,6 @@
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
@@ -16,6 +16,12 @@ import Portfolio from "./Portfolio";
 
 const router = createBrowserRouter([
   {
+    element: (
+      <PopupProvider>
+        <Outlet />
+      </PopupProvider>
+    ),
+
     children: [
       {
         path: "/",
@@ -90,12 +96,10 @@ const App: React.FC = () => {
   return (
     <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider chains={chains}>
-        <PopupProvider>
-          <RouterProvider router={router} fallbackElement={<></>} />
-          {/* <Header /> */}
-          <Toast />
-          {/* <Router /> */}
-        </PopupProvider>
+        <RouterProvider router={router} fallbackElement={<></>} />
+        {/* <Header /> */}
+        <Toast />
+        {/* <Router /> */}
         {/* Body */}
       </RainbowKitProvider>
     </WagmiConfig>

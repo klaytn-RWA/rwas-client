@@ -2,6 +2,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { readContract, waitForTransaction, writeContract } from "@wagmi/core";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAccount } from "wagmi";
 import abiIntermadiation from "../../abi/TranscaIntermediation.json";
 import abiUSDTSimulator from "../../abi/USDTSimulator.json";
@@ -18,6 +19,7 @@ import NFTCard from "./NFTCard";
 const NFTLendItem: React.FC<{ borrowReq: Intermediation }> = ({ borrowReq }) => {
   const [asset, setAsset] = useState<Asset>();
   const [bundle, setBundle] = useState<Bundle>();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [lendLoading, setLendLoading] = useState(false);
   const { address, isConnected } = useAccount();
@@ -51,6 +53,19 @@ const NFTLendItem: React.FC<{ borrowReq: Intermediation }> = ({ borrowReq }) => 
 
   const onHandleLend = async () => {
     setLendLoading(true);
+
+    if (borrowReq.creator === address) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Can not lending for yourself",
+          type: "error",
+        }),
+      );
+      setLendLoading(false);
+      return;
+    }
 
     const data = (await readContract({
       address: usdt,
@@ -101,18 +116,6 @@ const NFTLendItem: React.FC<{ borrowReq: Intermediation }> = ({ borrowReq }) => 
       }
     }
 
-    if (borrowReq.creator === address) {
-      dispatch(
-        setToast({
-          show: true,
-          title: "",
-          message: "Can not lending for yourself",
-          type: "error",
-        }),
-      );
-      setLendLoading(false);
-      return;
-    }
     try {
       const createLendOffer = await writeContract({
         address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT! as any,
@@ -134,6 +137,8 @@ const NFTLendItem: React.FC<{ borrowReq: Intermediation }> = ({ borrowReq }) => 
             }),
           );
           setLendLoading(false);
+          dispatch(getBorrowReqs({}));
+          navigate("/history");
           return;
         } else {
           dispatch(

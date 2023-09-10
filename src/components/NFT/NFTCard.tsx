@@ -36,7 +36,7 @@ const NFTCard: React.FC<{ nftData: Asset }> = ({ nftData }) => {
               <div className="flex space-x-1">
                 <div>Weight:</div>
                 <div className="font-semibold">
-                  {asset.weight.toString()} <span> {asset.assetType === 0 && "ounce"}</span>
+                  {ethers.utils.formatUnits(asset.weight!, 10)} <span> {asset.assetType === 0 && "ounce"}</span>
                 </div>
               </div>
               <div className="flex space-x-1">

@@ -17,7 +17,6 @@ dayjs.extend(localizedFormat);
 dayjs().format("lll");
 
 export const HistoryItem: React.FC<{ data: Intermediation; actionType: string }> = ({ data, actionType }) => {
-  console.log(data, 111);
   const [asset, setAsset] = useState<Asset>();
   const [bundle, setBundle] = useState<Bundle>();
 

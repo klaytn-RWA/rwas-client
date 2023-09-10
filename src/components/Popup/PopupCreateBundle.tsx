@@ -6,6 +6,8 @@ import { useAccount } from "wagmi";
 import abiTranscaAssetNFT from "../../abi/TranscaAssetNFT.json";
 import abiBundle from "../../abi/TranscaBundleNFT.json";
 import { transcaAsset, transcaBundle } from "../../config";
+import { getAssets } from "../../redux/reducers/assetReducer";
+import { getBundles } from "../../redux/reducers/bundleReducer";
 import { setToast } from "../../redux/reducers/toastReducer";
 import { useAppDispatch } from "../../redux/store";
 import Button from "../Button/Button";
@@ -136,7 +138,8 @@ const PopupCreateBundle: React.FC<{ nfts: Array<any>; loadingData: boolean }> = 
       const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: write.hash });
       if (waitTranscation.status === "success") {
         dispatch(setToast({ show: true, title: "", message: "Create bundle success", type: "success" }));
-
+        dispatch(getAssets({ address: address! }));
+        dispatch(getBundles({ address: address! }));
         setMinting(false);
         removeAll();
 

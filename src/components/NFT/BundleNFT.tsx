@@ -35,7 +35,9 @@ const BundleNFT: React.FC<{ bundle: Bundle }> = ({ bundle }) => {
         return (
           <Popup className="bg-gray-50">
             <h1 className="mb-4 text-center font-bold text-[20px]">Bundle #{bundle.id.toString()}</h1>
-            <div className="flex flex-cols-3 justify-center items-center space-y-2">{onShowNFTs()}</div>
+            <div className="flex justify-center items-center">
+              <div className="grid grid-cols-2 gap-1">{onShowNFTs()}</div>
+            </div>
           </Popup>
         );
       },

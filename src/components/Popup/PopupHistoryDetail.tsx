@@ -4,6 +4,7 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { ethers } from "ethers";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAccount, useContractReads } from "wagmi";
 import abiIntermediation from "../../abi/TranscaIntermediation.json";
 import abiUSDTSimulator from "../../abi/USDTSimulator.json";
@@ -30,6 +31,7 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
   const [cancelBorrowRequestLoading, setCancelBorrowRequestLoading] = useState(false);
   const [claimNFTLoading, setClaimNFTLoading] = useState(false);
   const { address } = useAccount();
+  const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
 
@@ -60,6 +62,19 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
 
   const onHandleReturnTheMoney = async () => {
     setReturnMoneyLoading(true);
+
+    if (borrowReq.returned) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "The debt has been successfully repaid before",
+          type: "error",
+        }),
+      );
+      setReturnMoneyLoading(false);
+      return;
+    }
 
     const data = (await readContract({
       address: usdt,
@@ -110,18 +125,6 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
       }
     }
 
-    if (borrowReq.returned) {
-      dispatch(
-        setToast({
-          show: true,
-          title: "",
-          message: "The debt has been successfully repaid before",
-          type: "error",
-        }),
-      );
-      setReturnMoneyLoading(false);
-      return;
-    }
     if (isExpireLendCanClaimNFT) {
       dispatch(
         setToast({
@@ -155,6 +158,7 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
         dispatch(getBorrowReqs({}));
         setReturnMoneyLoading(false);
         removeAll();
+        navigate("/history");
         return;
       } else {
         dispatch(
@@ -216,6 +220,7 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
         dispatch(getBorrowReqs({}));
         setCancelBorrowRequestLoading(false);
         removeAll();
+        navigate("/history");
         return;
       } else {
         dispatch(
@@ -277,6 +282,7 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
         dispatch(getBorrowReqs({}));
         setClaimNFTLoading(false);
         removeAll();
+        navigate("/history");
         return;
       } else {
         dispatch(

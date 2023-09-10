@@ -55,8 +55,6 @@ const Portfolio: React.FC<{}> = () => {
     ],
   });
 
-  console.log("7s200:contract:", contract);
-
   const assetIds = (contract as any)?.[0].result;
   const bundleIds = (contract as any)?.[1].result;
 
@@ -87,15 +85,15 @@ const Portfolio: React.FC<{}> = () => {
   };
 
   const onGetTotalLoanPaid = () => {
-    let total = 0;
+    let total = ethers.BigNumber.from(0);
     if (!intermediationRx.loading && intermediationRx.allBorrowReqs.length > 0) {
       intermediationRx.allBorrowReqs.forEach((element) => {
         if (element.borrowedAt > 0 && element.lendOfferReqId > 0) {
-          total = total + element.amount;
+          total = total.add(element.amount);
         }
       });
     }
-    return total.toString();
+    return total;
   };
 
   return (
@@ -127,7 +125,7 @@ const Portfolio: React.FC<{}> = () => {
             <div className="flex justify-between items-center space-x-2 w-[400px] bg-white drop-shadow-xl px-4 py-4 border border-none rounded-xl">
               <div className="text-[20px]">
                 <div className="text-[16px] font-normal">Total Loan Paid</div>
-                <div className="font-bold">{ethers.utils.formatUnits(onGetTotalLoanPaid())}$</div>
+                <div className="font-bold">{Number(ethers.utils.formatUnits(onGetTotalLoanPaid())).toFixed(2)}$</div>
               </div>
               {/* <ExchangeFunds size={60} /> */}
 
@@ -166,13 +164,12 @@ const Portfolio: React.FC<{}> = () => {
               {address && isConnected ? "Empty" : <ConnectButton />}
             </div>
           )}
-          {onShowBundleNFTs() ||
-            (onShowNFTs() && (
-              <div className="flex jusitfy-center items-center flex-wrap bg-white my-4 border border-none rounded-xl">
-                {onShowBundleNFTs()}
-                {onShowNFTs()}
-              </div>
-            ))}
+          {(onShowBundleNFTs() || onShowNFTs()) && (
+            <div className="flex jusitfy-center items-center flex-wrap bg-white my-4 border border-none rounded-xl">
+              {onShowBundleNFTs()}
+              {onShowNFTs()}
+            </div>
+          )}
         </div>
       </div>
     </>
