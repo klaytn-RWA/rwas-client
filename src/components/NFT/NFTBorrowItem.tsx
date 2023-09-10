@@ -374,7 +374,7 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
                       </div>
                     )}
                     <div className="grid grid-cols-2 gap-2">
-                      <NFTProperty title="weight" content={`${Number(ethers.utils.formatUnits(weight, 10)).toString()} gram`} />
+                      <NFTProperty title="weight" content={`${Number(ethers.utils.formatUnits(weight, 10)).toString()} ${asset?.assetType === 0 ? "ounce" : "gram"}`} />
                       {asset?.assetType === 0 ||
                         (bundle?.totalOraklValue && (
                           <NFTProperty title="Total gold value" content={`${Number(ethers.utils.formatEther(asset ? asset.oraklPrice : bundle.totalOraklValue)).toFixed(2)}$`} />
@@ -524,7 +524,9 @@ const NFTBorrowItem: React.FC<{ asset?: Asset; bundle?: Bundle }> = ({ asset, bu
         )}
         <div className="flex space-x-1">
           <div className="text-gray-900 text-[13px]">Weight:</div>
-          <div className="font-semibold text-[14px]">{Number(ethers.utils.formatUnits(weight, 10)).toString()} gram</div>
+          <div className="font-semibold text-[14px]">
+            {Number(ethers.utils.formatUnits(weight, 10)).toString()} {asset && asset.assetType === 0 ? "ounce" : "gram"}
+          </div>
         </div>
         {isQuickRaise && <div className="px-6 bg-green-700 font-bold text-white text-center border border-none rounded-2xl w-fit">Quick Raise</div>}
       </div>

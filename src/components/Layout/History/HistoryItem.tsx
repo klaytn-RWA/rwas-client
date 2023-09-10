@@ -129,12 +129,15 @@ export const HistoryItem: React.FC<{ data: Intermediation; actionType: string }>
       )}
       {isExpireLendCanClaimNFT && data.borrowedAt && (
         <div className="flex flex-col space-y-2 justify-end items-end">
-          <div className="text-[14px] bg-[#413c69] px-2 text-center text-white font-bold border border-none rounded-xl">Expire</div>
+          <div className="text-[14px] bg-[#413c69] px-2 text-center text-white font-bold border border-none rounded-xl">Expired</div>
           {actionType === "BORROW" && data.lenderWithdrawed && data.lenderWithdrawedAt > 0 && (
             <div className="text-[14px] bg-[#413c69] px-2 text-center text-white font-bold border border-none rounded-xl">Lender claimed your NFT</div>
           )}
           {actionType === "LEND" && data.lenderWithdrawed && data.lenderWithdrawedAt > 0 && (
             <div className="text-[14px] bg-green-500 px-2 text-center text-white font-bold border border-none rounded-xl">Claimed</div>
+          )}
+          {actionType === "LEND" && !data.lenderWithdrawed && isExpireLendCanClaimNFT && (
+            <div className="text-[14px] bg-green-500 px-2 text-center text-white font-bold border border-none rounded-xl">You can claim NFT</div>
           )}
         </div>
       )}

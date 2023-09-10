@@ -75,6 +75,18 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
       setReturnMoneyLoading(false);
       return;
     }
+    if (isExpireLendCanClaimNFT) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Loan expired before can't return back the money to lender ",
+          type: "error",
+        }),
+      );
+      setReturnMoneyLoading(false);
+      return;
+    }
 
     const data = (await readContract({
       address: usdt,
@@ -123,19 +135,6 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
           return;
         }
       }
-    }
-
-    if (isExpireLendCanClaimNFT) {
-      dispatch(
-        setToast({
-          show: true,
-          title: "",
-          message: "Loan expired before can't return back the money to lender ",
-          type: "error",
-        }),
-      );
-      setReturnMoneyLoading(false);
-      return;
     }
 
     const returnMoney = await writeContract({
@@ -256,6 +255,18 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
           show: true,
           title: "",
           message: "The loan has not expired, you cannot claim nft",
+          type: "error",
+        }),
+      );
+      setClaimNFTLoading(false);
+      return;
+    }
+    if (borrowReq.lenderWithdrawed && borrowReq.lenderWithdrawedAt > 0) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "You have claimed this nft before",
           type: "error",
         }),
       );
