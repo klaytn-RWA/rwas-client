@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { ethers } from "ethers";
@@ -12,6 +13,7 @@ import { useAppDispatch } from "../../../redux/store";
 import PopupHistoryDetail from "../../Popup/PopupHistoryDetail";
 import { usePopups } from "../../Popup/PopupProvider";
 
+dayjs.extend(duration);
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 dayjs().format("lll");
@@ -78,7 +80,6 @@ export const HistoryItem: React.FC<{ data: Intermediation; actionType: string }>
   };
 
   const isExpireLendCanClaimNFT = (contract as any)?.[0].result;
-  const duration = (contract as any)?.[1].result;
 
   return (
     <div
@@ -119,9 +120,10 @@ export const HistoryItem: React.FC<{ data: Intermediation; actionType: string }>
           <div className="text-[14px] font-semibold">Expired Time:</div>
 
           <div className="text-[13px] text-gray-600 leading-[16px] mb-4">
-            {dayjs(Number(duration) * 1000)
+            {dayjs(Number(data.borrowedAt) * 1000)
               .add(data.duration, "minutes")
-              .toString()}
+              .format("llll")}{" "}
+            ({dayjs.duration(Number(data.duration), "minutes").humanize()})
           </div>
 
           <div className="text-[14px] bg-[#413c69] px-2 text-center text-white font-bold border border-none rounded-xl">{Number(data.duration)} min(s)</div>

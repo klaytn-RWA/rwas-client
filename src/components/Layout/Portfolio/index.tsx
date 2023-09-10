@@ -2,7 +2,6 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ethers } from "ethers";
 import { useEffect } from "react";
 import { useAccount, useContractReads } from "wagmi";
-import {} from "../../../../public/icons/diamond1.png";
 import abiAsset from "../../../abi/TranscaAssetNFT.json";
 import abiBundle from "../../../abi/TranscaBundleNFT.json";
 import { getAssets, selectAsset } from "../../../redux/reducers/assetReducer";
@@ -13,8 +12,6 @@ import Header from "../../Header/Header";
 import BundleNFT from "../../NFT/BundleNFT";
 import NFTCard from "../../NFT/NFTCard";
 import SearchInput from "../../Search/SearchInput";
-
-console.log(import.meta.env);
 
 const Portfolio: React.FC<{}> = () => {
   const dispatch = useAppDispatch();
@@ -30,13 +27,7 @@ const Portfolio: React.FC<{}> = () => {
     dispatch(getBorrowReqs({}));
   }, [address, dispatch]);
 
-  // TO-DO counter asset,bundle, all-borrow-balance
-  const {
-    data: contract,
-    isError: contractError,
-    isLoading: contractLoading,
-    isFetched: contractFetched,
-  } = useContractReads({
+  const { data: contract } = useContractReads({
     watch: true,
     contracts: [
       {
