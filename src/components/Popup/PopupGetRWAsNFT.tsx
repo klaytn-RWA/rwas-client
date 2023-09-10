@@ -4,6 +4,7 @@ import axios from "axios";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useAccount } from "wagmi";
+import { api } from "../../config";
 import { getAssets } from "../../redux/reducers/assetReducer";
 import { setToast } from "../../redux/reducers/toastReducer";
 import { useAppDispatch } from "../../redux/store";
@@ -152,7 +153,7 @@ const PopupGetRWAsNFT: React.FC<{}> = () => {
       // "user_define_price": null,
       // "appraisal_price": null
       const res = await axios.post(
-        "http://localhost:3333/v1/mint",
+        `${api}/v1/mint`,
         {
           to: address!,
           weight: data.weight,
