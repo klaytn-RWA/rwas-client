@@ -9,6 +9,10 @@ root.render(
   <React.StrictMode>
     <Provider store={store}>
       {/* <Provider store={store}> */}
+      {/* <Provider store={store}> */}
+      {/* <Provider store={store}> */}
+      {/* <Provider store={store}> */}
+
       {/* <Provider store={store}>
       <div className="main-body">
         <Router />
