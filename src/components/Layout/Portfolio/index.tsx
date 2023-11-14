@@ -101,7 +101,7 @@ const Portfolio: React.FC<{}> = () => {
                 <div className="text-[16px] font-normal">Total vault RWAs NFT</div>
                 <div className="font-bold">{Number(assetIds) >= 0 ? Number(assetIds) : 0}</div>
               </div>
-              <img className="max-w-[90px] max-h-[90px]" src="/icons/bundleNFT.webp" alt="nft" />
+              <img className="max-w-[90px] max-h-[90px]" src="/icons/bundleNFT.png" alt="nft" />
             </div>
             <div className="flex justify-between items-center space-x-2 w-[400px] bg-white drop-shadow-xl px-4 py-4 border border-none rounded-xl">
               <div className="text-[20px]">

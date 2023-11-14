@@ -45,7 +45,7 @@ const BundleService: React.FC = () => {
     <div className="bg-white flex-1 border border-none rounded-xl shadow-xl">
       <h3 className="text-center my-4 font-extrabold text-transparent text-6xl bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Create NFT Bundle</h3>
       <div className="w-full mx-auto">
-        <img src="/icons/bundleNFT.webp" className="mx-auto max-w-[400px] max-h-[400px]" alt="" />
+        <img src="/icons/bundleNFT.png" className="mx-auto max-w-[400px] max-h-[400px]" alt="" />
       </div>
       <div className="mx-4 my-4">
         <Message
