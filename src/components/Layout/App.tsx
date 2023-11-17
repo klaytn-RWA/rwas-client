@@ -64,7 +64,7 @@ const App: React.FC = () => {
           symbol: "KLAY",
         },
         rpcUrls: {
-          public: { http: ["https://klaytn-baobab.blockpi.network/v1/rpc/public"] },
+          public: { http: ["https://public-en-baobab.klaytn.net	"] },
           default: { http: ["https://api.baobab.klaytn.net:8651"] },
         },
         blockExplorers: {

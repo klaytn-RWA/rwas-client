@@ -169,6 +169,7 @@ const PopupGetRWAsNFT: React.FC<{}> = () => {
           },
         },
       );
+      console.log("7s200:res", res);
       if (res.status === 200) {
         dispatch(
           setToast({

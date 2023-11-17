@@ -40,6 +40,7 @@ export const getBorrowReqs = createAsyncThunk("borrow/get", async ({}: {}, {}) =
       functionName: "getAllBorrows",
       args: [],
     });
+
     const _borrowReqs = borrowReqs as Array<Intermediation>;
     if (_borrowReqs.length > 0) {
       return _borrowReqs;
@@ -60,6 +61,7 @@ export const defaultIntermediationReducer: IntermediationReducer = {
 const intermediationReducer = createReducer(defaultIntermediationReducer, (builder) => {
   builder
     .addCase(getBorrowReqs.fulfilled, (state, action) => {
+      console.log("7s200:action", action.payload);
       return { ...state, loading: false, allBorrowReqs: action.payload };
     })
     .addCase(getBorrowReqs.rejected, (state) => {
