@@ -6,7 +6,7 @@ import abiAsset from "../../../abi/TranscaAssetNFT.json";
 import abiBundle from "../../../abi/TranscaBundleNFT.json";
 import { getAssets, selectAsset } from "../../../redux/reducers/assetReducer";
 import { getBundles, selectBundle } from "../../../redux/reducers/bundleReducer";
-import { getBorrowReqs, selectIntermediation } from "../../../redux/reducers/intermediationReducer";
+import { selectIntermediation } from "../../../redux/reducers/intermediationReducer";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import Button from "../../Button/Button";
 import Header from "../../Header/Header";
@@ -28,7 +28,7 @@ const Portfolio: React.FC<{}> = () => {
   useEffect(() => {
     dispatch(getAssets({ address: address! }));
     dispatch(getBundles({ address: address! }));
-    dispatch(getBorrowReqs({}));
+    // dispatch(getBorrowReqs({}));
   }, [address, dispatch]);
 
   const { data: contract } = useContractReads({

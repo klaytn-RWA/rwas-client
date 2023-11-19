@@ -74,6 +74,7 @@ const App: React.FC = () => {
           symbol: "KLAY",
         },
         rpcUrls: {
+          // https://rpc.ankr.com/klaytn_testnet
           public: { http: ["https://public-en-baobab.klaytn.net"] },
           default: { http: ["https://api.baobab.klaytn.net:8651"] },
         },

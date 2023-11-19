@@ -40,11 +40,19 @@ export const getAssets = createAsyncThunk("asset/get", async ({ address }: { add
     if (address.length === 0 || !address) {
       return [];
     }
+    const ass = await readContract({
+      address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
+      abi: abiAsset,
+      functionName: "getAssetDetail",
+      args: [0],
+    });
+    console.log("7s200:as", ass);
+
     const listAsset = await readContract({
       address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
       abi: abiAsset,
       functionName: "getAllAssetByUser",
-      args: [address],
+      args: [address!],
     });
 
     if (!listAsset || (listAsset as Array<Asset>).length === 0) {

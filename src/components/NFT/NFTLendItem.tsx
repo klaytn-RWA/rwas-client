@@ -163,6 +163,7 @@ const NFTLendItem: React.FC<{ borrowReq: Intermediation }> = ({ borrowReq }) => 
         setLendLoading(false);
       }
     } catch (error) {
+      console.log(error);
       setLendLoading(false);
     }
   };

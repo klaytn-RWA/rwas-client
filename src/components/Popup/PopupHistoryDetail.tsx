@@ -62,7 +62,7 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
 
   const onHandleReturnTheMoney = async () => {
     setReturnMoneyLoading(true);
-
+    console.log("7s200:borrowreq");
     if (borrowReq.returned) {
       dispatch(
         setToast({
@@ -96,32 +96,17 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
     })) as bigint;
 
     if (data < borrowReq.amount) {
-      if (!data) {
-        try {
-          const approve = await writeContract({
-            address: usdt,
-            abi: abiUSDTSimulator,
-            functionName: "approve",
-            args: [transcaIntermediation, borrowReq.amount],
-          });
+      try {
+        const approve = await writeContract({
+          address: usdt,
+          abi: abiUSDTSimulator,
+          functionName: "approve",
+          args: [transcaIntermediation, borrowReq.amount],
+        });
 
-          const data = await waitForTransaction({ hash: approve.hash });
-          if (data.status === "reverted") {
-            console.log(data);
-            dispatch(
-              setToast({
-                show: true,
-                title: "",
-                message: "Approve failed",
-                type: "error",
-              }),
-            );
-
-            setReturnMoneyLoading(false);
-            return;
-          }
-        } catch (error) {
-          console.error(error);
+        const data = await waitForTransaction({ hash: approve.hash });
+        if (data.status === "reverted") {
+          console.log(data);
           dispatch(
             setToast({
               show: true,
@@ -134,8 +119,22 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
           setReturnMoneyLoading(false);
           return;
         }
+      } catch (error) {
+        console.error(error);
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Approve failed",
+            type: "error",
+          }),
+        );
+
+        setReturnMoneyLoading(false);
+        return;
       }
     }
+    console.log("7s200-2");
 
     const returnMoney = await writeContract({
       address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT! as any,
@@ -143,6 +142,7 @@ const PopupHistoryDetail: React.FC<{ actionType: string; nft?: Asset; bundle?: B
       functionName: "returnTheMoney",
       args: [borrowReq.borrowReqId],
     });
+
     if (returnMoney.hash) {
       const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: returnMoney.hash });
       if (waitTranscation.status === "success") {

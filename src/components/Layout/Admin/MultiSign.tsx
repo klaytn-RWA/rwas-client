@@ -2,6 +2,9 @@ import { waitForTransaction, writeContract } from "@wagmi/core";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import abiTranscaAsset from "../../../abi/TranscaAssetNFT.json";
+// import abiTranscaBundle from "../../../abi/TranscaBundleNFT.json";
+import abiTranscaI from "../../../abi/TranscaIntermediation.json";
+
 import { getRequestMint, selectAsset } from "../../../redux/reducers/assetReducer";
 import { setToast } from "../../../redux/reducers/toastReducer";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
@@ -22,6 +25,7 @@ const MultiSign: React.FC<{}> = () => {
   useEffect(() => {
     dispatch(getRequestMint({}));
   }, [dispatch]);
+  // console.log(abiTranscaAsset, abiTranscaI, abiTranscaBundle);
 
   const onSign = async (signer: any, index: number, btn: string) => {
     if (!isConnected && (signer !== AdminAddress.stocker || signer !== AdminAddress.audit || signer !== AdminAddress.transca)) {
@@ -122,10 +126,10 @@ const MultiSign: React.FC<{}> = () => {
     }
     try {
       const sign = await writeContract({
-        address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT! as any,
-        abi: abiTranscaAsset,
-        functionName: "executeMint",
-        args: [reqIndex],
+        address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT! as any,
+        abi: abiTranscaI,
+        functionName: "setToken",
+        args: [import.meta.env.VITE_TRANSCA_TOKEN_CONTRACT!],
       });
       if (sign.hash) {
         const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: sign.hash });
@@ -167,6 +171,7 @@ const MultiSign: React.FC<{}> = () => {
         return;
       }
     } catch (error) {
+      console.log(error);
       setIsLoadingExecuteMint(false);
       return;
     }
@@ -185,7 +190,7 @@ const MultiSign: React.FC<{}> = () => {
                   className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-xl font-bold text-white w-[150px] text-[13px] leading-[21px] !px-1 disabled:opacity-80"
                   onClick={() => onHandleMint(i)}
                   loading={isLoadingExecuteMint}
-                  disabled={e.executed}
+                  // disabled={e.executed}
                 >
                   {e.executed ? "Minted" : "Execute mint"}
                 </Button>

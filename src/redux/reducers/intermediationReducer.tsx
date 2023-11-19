@@ -34,6 +34,26 @@ export type IntermediationReducer = {
 
 export const getBorrowReqs = createAsyncThunk("borrow/get", async ({}: {}, {}) => {
   try {
+    const assetNft = await readContract({
+      address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT!,
+      abi: abi,
+      functionName: "assetNft",
+      args: [],
+    });
+    const bundleNft = await readContract({
+      address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT!,
+      abi: abi,
+      functionName: "bundleNft",
+      args: [],
+    });
+    const token = await readContract({
+      address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT!,
+      abi: abi,
+      functionName: "token",
+      args: [],
+    });
+    console.log("7s200:", assetNft, bundleNft, token);
+
     const borrowReqs = await readContract({
       address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT!,
       abi: abi,
