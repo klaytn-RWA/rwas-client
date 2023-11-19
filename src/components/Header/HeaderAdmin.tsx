@@ -1,13 +1,9 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { History } from "@styled-icons/boxicons-regular";
-import { ExchangeFunds } from "@styled-icons/remix-fill";
-import { HandCoin } from "@styled-icons/remix-line";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import PopupGetRWAsNFT from "../Popup/PopupGetRWAsNFT";
 import { usePopups } from "../Popup/PopupProvider";
 
-const Header: React.FC<{}> = () => {
+const HeaderAdmin: React.FC<{}> = () => {
   const [isOpenMobileMenu, setIsOpenMobileMenu] = useState(false);
   const menuBackgroundService = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
@@ -30,13 +26,6 @@ const Header: React.FC<{}> = () => {
       window.removeEventListener("resize", handleWindowResize);
     };
   }, []);
-  const onHanleOpenPopUpGetRWAsNFT = () => {
-    addPopup({
-      Component: () => {
-        return <PopupGetRWAsNFT />;
-      },
-    });
-  };
 
   return (
     <>
@@ -70,11 +59,6 @@ const Header: React.FC<{}> = () => {
                 >
                   <img src="/icons/transca-vault-logo.svg" className="h-6" alt="Transca vault Logo" />
                 </div>
-                {/* <div className="">
-                  <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 !rounded-xl font-bold text-white leading-[21px]" onClick={() => onHanleOpenPopUpGetRWAsNFT()}>
-                    Get RWAs NFT
-                  </Button>
-                </div> */}
               </div>
             </div>
             {/* Connect wallet */}
@@ -116,68 +100,12 @@ const Header: React.FC<{}> = () => {
             <li>
               <div
                 onClick={() => {
-                  navigate("/nft-service");
+                  navigate("/admin/multi-sign");
                 }}
                 className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100  group ${data.pathname === "/nft-service" && "bg-gray-100"}`}
               >
                 <img src="/icons/card.png" className="h-[24px] w-[24px]" alt="" />
-                <span className="ml-3">NFTs Service</span>
-              </div>
-            </li>
-
-            <li>
-              <div
-                onClick={() => {
-                  navigate("/borrow");
-                }}
-                className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100  group ${data.pathname === "/borrow" && "bg-gray-100"}`}
-              >
-                <HandCoin size={24} />
-                <span className="flex-1 ml-3 whitespace-nowrap">Borrow</span>
-                <span className="inline-flex items-center justify-center w-3 h-3 p-3 ml-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">3</span>
-              </div>
-            </li>
-            <li>
-              <div
-                onClick={() => {
-                  navigate("/lend");
-                }}
-                className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100  group ${data.pathname === "/lend" && "bg-gray-100"}`}
-              >
-                <ExchangeFunds size={24} />
-                <span className="flex-1 ml-3 whitespace-nowrap">Lend</span>
-                <span className="inline-flex items-center justify-center w-3 h-3 p-3 ml-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">3</span>
-              </div>
-            </li>
-            <li>
-              <div
-                onClick={() => {
-                  navigate("/history");
-                }}
-                className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group ${data.pathname === "/history" && "bg-gray-100"}`}
-              >
-                <History size={24} />
-                <span className="ml-3">History</span>
-              </div>
-            </li>
-            <li>
-              <div
-                onClick={() => {
-                  navigate("/marketplace");
-                }}
-                className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100  group ${data.pathname === "/marketplace" && "bg-gray-100"}`}
-              >
-                <svg
-                  className="flex-shrink-0 w-[24px] h-[24px] text-gray-500 transition duration-75"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 18 18"
-                >
-                  <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z" />
-                </svg>
-                <span className="flex-1 ml-3 whitespace-nowrap">Marketplace</span>
-                <span className="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full">Soon</span>
+                <span className="ml-3">Verify Assets</span>
               </div>
             </li>
           </ul>
@@ -230,4 +158,4 @@ const Header: React.FC<{}> = () => {
   );
 };
 
-export default Header;
+export default HeaderAdmin;

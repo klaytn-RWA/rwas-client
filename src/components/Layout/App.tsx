@@ -7,6 +7,8 @@ import { publicProvider } from "wagmi/providers/public";
 import "../../styles/main.scss";
 import PopupProvider from "../Popup/PopupProvider";
 import Toast from "../Toast/toast";
+import Admin from "./Admin/Admin";
+import MultiSign from "./Admin/MultiSign";
 import Borrow from "./Borrow";
 import History from "./History/History";
 import Lend from "./Lend";
@@ -47,6 +49,14 @@ const router = createBrowserRouter([
         path: "/nft-service",
         element: <NFTServices />,
       },
+      {
+        path: "/admin",
+        element: <Admin />,
+      },
+      {
+        path: "/admin/multi-sign",
+        element: <MultiSign />,
+      },
     ],
   },
 ]);
@@ -64,7 +74,7 @@ const App: React.FC = () => {
           symbol: "KLAY",
         },
         rpcUrls: {
-          public: { http: ["https://public-en-baobab.klaytn.net	"] },
+          public: { http: ["https://public-en-baobab.klaytn.net"] },
           default: { http: ["https://api.baobab.klaytn.net:8651"] },
         },
         blockExplorers: {

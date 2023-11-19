@@ -8,10 +8,12 @@ import { getAssets, selectAsset } from "../../../redux/reducers/assetReducer";
 import { getBundles, selectBundle } from "../../../redux/reducers/bundleReducer";
 import { getBorrowReqs, selectIntermediation } from "../../../redux/reducers/intermediationReducer";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
+import Button from "../../Button/Button";
 import Header from "../../Header/Header";
 import BundleNFT from "../../NFT/BundleNFT";
 import NFTCard from "../../NFT/NFTCard";
-import SearchInput from "../../Search/SearchInput";
+import PopupGetRWAsNFT from "../../Popup/PopupGetRWAsNFT";
+import { usePopups } from "../../Popup/PopupProvider";
 
 const Portfolio: React.FC<{}> = () => {
   const dispatch = useAppDispatch();
@@ -20,6 +22,7 @@ const Portfolio: React.FC<{}> = () => {
   const assetRx = useAppSelector(selectAsset);
   const bundleRx = useAppSelector(selectBundle);
   const intermediationRx = useAppSelector(selectIntermediation);
+  const { addPopup } = usePopups();
 
   useEffect(() => {
     dispatch(getAssets({ address: address! }));
@@ -86,6 +89,14 @@ const Portfolio: React.FC<{}> = () => {
     return total;
   };
 
+  const onHanleOpenPopUpGetRWAsNFT = () => {
+    addPopup({
+      Component: () => {
+        return <PopupGetRWAsNFT />;
+      },
+    });
+  };
+
   return (
     <>
       <Header />
@@ -132,7 +143,7 @@ const Portfolio: React.FC<{}> = () => {
         </div>
         <div>
           <div className="bg-white px-4 py-4 border border-none rounded-xl flex flex-col lg:flex-row justify-between items-center space-x-4">
-            <div className="flex-1 pb-2 lg:pb-0">
+            {/* <div className="flex-1 pb-2 lg:pb-0">
               <SearchInput />
             </div>
             <div className="flex justify-center items-center space-x-2 max-w-[500px] min-w-[400px]">
@@ -147,6 +158,18 @@ const Portfolio: React.FC<{}> = () => {
                 <option value="fully-furnished">Price</option>
                 <option value="partially-furnished">Mint date</option>
               </select>
+            </div> */}
+            <div className="flex space-x-4">
+              <div className="">
+                <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 !rounded-xl font-bold text-white leading-[21px]" onClick={() => onHanleOpenPopUpGetRWAsNFT()}>
+                  Get RWAs NFT
+                </Button>
+              </div>
+              <div className="">
+                <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 !rounded-xl font-bold text-white leading-[21px]" onClick={() => onHanleOpenPopUpGetRWAsNFT()}>
+                  Your Requests
+                </Button>
+              </div>
             </div>
           </div>
           {!onShowBundleNFTs() && !onShowNFTs() && (
