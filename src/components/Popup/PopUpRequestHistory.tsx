@@ -12,13 +12,14 @@ const PopUpRequestHistory: React.FC<{}> = () => {
   useEffect(() => {
     dispatch(getRequestMint({}));
   }, [dispatch]);
-  console.log("7s200:", assetRx);
+
+  console.log("7s200:asset", assetRx);
 
   const onShowReqs = () => {
     let temp = null;
     if (!assetRx.loading && assetRx.reqs.length > 0) {
       temp = assetRx.reqs.map((e, i) => {
-        if (address && isConnected) {
+        if (address && isConnected && address === e.owner) {
           return (
             <div key={i} className="flex space-x-2 border border-2 rounded-2xl p-4 shadow-xl my-4">
               <div className="flex justify-center space-x-2 w-1/7">

@@ -505,6 +505,21 @@
             "internalType": "uint256",
             "name": "numConfirmations",
             "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "isAuditSign",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isStockerSign",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isTranscaSign",
+            "type": "bool"
           }
         ],
         "internalType": "struct TranscaAssetNFT.MintRequest",
@@ -641,6 +656,107 @@
             "internalType": "uint256",
             "name": "numConfirmations",
             "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "isAuditSign",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isStockerSign",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isTranscaSign",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct TranscaAssetNFT.MintRequest[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "getAllMintRequestByUser",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "to",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "weight",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "expireTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint16",
+            "name": "assetType",
+            "type": "uint16"
+          },
+          {
+            "internalType": "string",
+            "name": "indentifierCode",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenUri",
+            "type": "string"
+          },
+          {
+            "internalType": "int256",
+            "name": "userDefinePrice",
+            "type": "int256"
+          },
+          {
+            "internalType": "int256",
+            "name": "appraisalPrice",
+            "type": "int256"
+          },
+          {
+            "internalType": "bool",
+            "name": "executed",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "numConfirmations",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "isAuditSign",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isStockerSign",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isTranscaSign",
+            "type": "bool"
           }
         ],
         "internalType": "struct TranscaAssetNFT.MintRequest[]",
@@ -1009,6 +1125,21 @@
         "internalType": "uint256",
         "name": "numConfirmations",
         "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isAuditSign",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "isStockerSign",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "isTranscaSign",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",

@@ -18,6 +18,23 @@ export type Asset = {
   weight: number;
 };
 
+export type MintReq = {
+  appraisalPrice: number;
+  assetId: number;
+  assetType: number;
+  expireTime: number;
+  image: string;
+  indentifierCode: string;
+  oraklPrice: number;
+  owner: string;
+  executed: boolean;
+  userDefinePrice: number;
+  weight: number;
+  isAuditSign: boolean;
+  isStockerSign: boolean;
+  isTranscaSign: boolean;
+};
+
 export const getAssets = createAsyncThunk("asset/get", async ({ address }: { address: string }, { getState, dispatch }) => {
   try {
     if (address.length === 0 || !address) {
@@ -102,23 +119,34 @@ export const getRequestMint = createAsyncThunk("asset/requests", async ({}: {}) 
     functionName: "getAllMintRequest",
     args: [],
   })) as Array<any>;
-  console.log("7s200:reqs", reqs);
-  let result: Array<Asset> = [];
+
+  // const reqs2 = await readContract({
+  //   address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT! as any,
+  //   abi: abiAsset,
+  //   functionName: "audit",
+  //   args: [],
+  // });
+  // console.log(reqs2);
+
+  let result: Array<MintReq> = [];
   if (reqs.length > 0) {
     for (let index = 0; index < reqs.length; index++) {
       const element = reqs[index];
-      let temp: Asset = {
+      let temp: MintReq = {
         appraisalPrice: Number(ethers.utils.formatEther(element.appraisalPrice)),
         assetId: element.assetId,
         assetType: element.assetType,
         expireTime: Number(element.expireTime),
         image: "",
+        executed: element.executed,
         indentifierCode: element.indentifierCode,
         oraklPrice: 0,
         owner: element.to,
-        startTime: Number(element.startTime),
         userDefinePrice: Number(ethers.utils.formatEther(element.userDefinePrice)),
         weight: Number(ethers.utils.formatEther(element.weight)),
+        isAuditSign: element.isAuditSign,
+        isStockerSign: element.isStockerSign,
+        isTranscaSign: element.isTranscaSign,
       };
       const response = await fetch(element.tokenUri as string)
         .then((response) => response.json())
@@ -136,7 +164,7 @@ export const getRequestMint = createAsyncThunk("asset/requests", async ({}: {}) 
 
 export type AssetReducer = {
   assets: Asset[];
-  reqs: Asset[];
+  reqs: MintReq[];
   loading: boolean;
 };
 

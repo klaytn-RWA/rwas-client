@@ -61,7 +61,6 @@ export const defaultIntermediationReducer: IntermediationReducer = {
 const intermediationReducer = createReducer(defaultIntermediationReducer, (builder) => {
   builder
     .addCase(getBorrowReqs.fulfilled, (state, action) => {
-      console.log("7s200:action", action.payload);
       return { ...state, loading: false, allBorrowReqs: action.payload };
     })
     .addCase(getBorrowReqs.rejected, (state) => {

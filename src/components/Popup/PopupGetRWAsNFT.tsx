@@ -1,6 +1,6 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CheckCircleFill } from "@styled-icons/bootstrap";
-import { readContract, waitForTransaction, writeContract } from "@wagmi/core";
+import { waitForTransaction, writeContract } from "@wagmi/core";
 import axios from "axios";
 import { ethers } from "ethers";
 import { useState } from "react";
@@ -135,9 +135,9 @@ const PopupGetRWAsNFT: React.FC<{}> = () => {
 
   const onShowNFTSample = () => {
     let temp = null;
-    temp = NFTSampleData.map((e) => {
+    temp = NFTSampleData.map((e, i) => {
       return (
-        <div className="cursor-pointer relative" onClick={() => setNFT(e)}>
+        <div key={i} className="cursor-pointer relative" onClick={() => setNFT(e)}>
           <img className="w-[100px] h-[120px] border border-none rounded-xl" src={e.img} key={e.id} />
           {e.id === nft?.id && <CheckCircleFill className="absolute top-2 left-2" size={20} color="green" />}
         </div>
@@ -149,15 +149,6 @@ const PopupGetRWAsNFT: React.FC<{}> = () => {
   const onOpenPopUpSipping = () => {
     return addPopup({
       Component: () => {
-        const read = async () => {
-          const req = await readContract({
-            address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT! as any,
-            abi: abiTranscaAsset,
-            functionName: "getAllMintRequest",
-            args: [],
-          });
-          console.log("7s200:req", req);
-        };
         return (
           <Popup className="bg-gray-50 min-w-[800px]">
             <h1 className="mb-4 text-center font-bold text-[20px]">Confirm transcation to Get RWAs NFT by shiping asset</h1>
@@ -202,11 +193,7 @@ const PopupGetRWAsNFT: React.FC<{}> = () => {
 
             <div className="flex flex-col justify-center items-center space-y-2 my-8">
               {isConnected && address ? (
-                <Button
-                  className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white w-[300px] leading-[21px]"
-                  onClick={read}
-                  loading={getting}
-                >
+                <Button className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white w-[300px] leading-[21px]" loading={getting}>
                   Confirm transcation
                 </Button>
               ) : (
@@ -251,7 +238,6 @@ const PopupGetRWAsNFT: React.FC<{}> = () => {
           },
         },
       );
-      console.log("7s200:res", res);
       if (res.status === 200) {
         // call request
         dispatch(
