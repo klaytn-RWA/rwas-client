@@ -1,5 +1,6 @@
 import { createAsyncThunk, createReducer } from "@reduxjs/toolkit";
 import { readContract } from "@wagmi/core";
+import { ethers } from "ethers";
 import abiAsset from "../../abi/TranscaAssetNFT.json";
 import { RootState } from "../store";
 
@@ -94,13 +95,54 @@ export const getAssetDetail = createAsyncThunk("asset/detail", async ({ id, cb }
   } catch (error) {}
 });
 
+export const getRequestMint = createAsyncThunk("asset/requests", async ({}: {}) => {
+  const reqs = (await readContract({
+    address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT! as any,
+    abi: abiAsset,
+    functionName: "getAllMintRequest",
+    args: [],
+  })) as Array<any>;
+  console.log("7s200:reqs", reqs);
+  let result: Array<Asset> = [];
+  if (reqs.length > 0) {
+    for (let index = 0; index < reqs.length; index++) {
+      const element = reqs[index];
+      let temp: Asset = {
+        appraisalPrice: Number(ethers.utils.formatEther(element.appraisalPrice)),
+        assetId: element.assetId,
+        assetType: element.assetType,
+        expireTime: Number(element.expireTime),
+        image: "",
+        indentifierCode: element.indentifierCode,
+        oraklPrice: 0,
+        owner: element.to,
+        startTime: Number(element.startTime),
+        userDefinePrice: Number(ethers.utils.formatEther(element.userDefinePrice)),
+        weight: Number(ethers.utils.formatEther(element.weight)),
+      };
+      const response = await fetch(element.tokenUri as string)
+        .then((response) => response.json())
+        .catch(() => {
+          return null;
+        });
+      if (response) {
+        temp.image = response.image;
+      }
+      result.push(temp);
+    }
+  }
+  return result;
+});
+
 export type AssetReducer = {
   assets: Asset[];
+  reqs: Asset[];
   loading: boolean;
 };
 
 export const defaultAssetReducer: AssetReducer = {
   assets: [],
+  reqs: [],
   loading: false,
 };
 
@@ -114,6 +156,16 @@ const assetReducer = createReducer(defaultAssetReducer, (builder) => {
       return { ...state, loading: false };
     })
     .addCase(getAssets.pending, (state) => {
+      return { ...state, loading: true };
+    })
+    .addCase(getRequestMint.fulfilled, (state, action) => {
+      state.loading = false;
+      state.reqs = action.payload;
+    })
+    .addCase(getRequestMint.rejected, (state) => {
+      return { ...state, loading: false };
+    })
+    .addCase(getRequestMint.pending, (state) => {
       return { ...state, loading: true };
     });
 });

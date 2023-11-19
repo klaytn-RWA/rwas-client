@@ -14,6 +14,7 @@ import BundleNFT from "../../NFT/BundleNFT";
 import NFTCard from "../../NFT/NFTCard";
 import PopupGetRWAsNFT from "../../Popup/PopupGetRWAsNFT";
 import { usePopups } from "../../Popup/PopupProvider";
+import PopUpRequestHistory from "../../Popup/PopUpRequestHistory";
 
 const Portfolio: React.FC<{}> = () => {
   const dispatch = useAppDispatch();
@@ -97,6 +98,14 @@ const Portfolio: React.FC<{}> = () => {
     });
   };
 
+  const onHandleOpenOpopUpRequestHistory = () => {
+    addPopup({
+      Component: () => {
+        return <PopUpRequestHistory />;
+      },
+    });
+  };
+
   return (
     <>
       <Header />
@@ -166,7 +175,7 @@ const Portfolio: React.FC<{}> = () => {
                 </Button>
               </div>
               <div className="">
-                <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 !rounded-xl font-bold text-white leading-[21px]" onClick={() => onHanleOpenPopUpGetRWAsNFT()}>
+                <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 !rounded-xl font-bold text-white leading-[21px]" onClick={() => onHandleOpenOpopUpRequestHistory()}>
                   Your Requests
                 </Button>
               </div>
