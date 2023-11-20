@@ -124,6 +124,17 @@ const Header: React.FC<{}> = () => {
                 <span className="ml-3">NFTs Service</span>
               </div>
             </li>
+            <li>
+              <div
+                onClick={() => {
+                  navigate("/lottery");
+                }}
+                className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100  group ${data.pathname === "/nft-service" && "bg-gray-100"}`}
+              >
+                <img src="/icons/lottery.jpg" className="h-[24px] w-[24px]" alt="" />
+                <span className="ml-3">Lottery</span>
+              </div>
+            </li>
 
             <li>
               <div

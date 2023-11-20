@@ -12,6 +12,7 @@ import MultiSign from "./Admin/MultiSign";
 import Borrow from "./Borrow";
 import History from "./History/History";
 import Lend from "./Lend";
+import Lottery from "./Lottery/Lottery";
 import Marketplace from "./Marketplace";
 import NFTServices from "./NFTServices";
 import Portfolio from "./Portfolio";
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
       {
         path: "/nft-service",
         element: <NFTServices />,
+      },
+      {
+        path: "/lottery",
+        element: <Lottery />,
       },
       {
         path: "/admin",

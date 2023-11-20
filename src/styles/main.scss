@@ -141,3 +141,25 @@
     margin: 0;
   }
 }
+
+.lottery-body {
+  background-color: rgb(17, 9, 41);
+
+  &:after {
+    position: absolute;
+    z-index: 0;
+    top: 5%;
+    left: -5%;
+
+    // z-index: -99;
+    background-image: url("../../public/img/home-bg.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 100%;
+    height: 100%;
+    /* Add the blur effect */
+
+    display: block;
+    content: "";
+  }
+}
