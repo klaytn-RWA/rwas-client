@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import abiTranscaAsset from "../../../abi/TranscaAssetNFT.json";
 // import abiTranscaBundle from "../../../abi/TranscaBundleNFT.json";
-import abiTranscaI from "../../../abi/TranscaIntermediation.json";
 
 import { getRequestMint, selectAsset } from "../../../redux/reducers/assetReducer";
 import { setToast } from "../../../redux/reducers/toastReducer";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
+import { truncateSuiTx } from "../../../services/address";
 import Button from "../../Button/Button";
 import HeaderAdmin from "../../Header/HeaderAdmin";
 import { AdminAddress } from "./data";
@@ -126,10 +126,10 @@ const MultiSign: React.FC<{}> = () => {
     }
     try {
       const sign = await writeContract({
-        address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT! as any,
-        abi: abiTranscaI,
-        functionName: "setToken",
-        args: [import.meta.env.VITE_TRANSCA_TOKEN_CONTRACT!],
+        address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT! as any,
+        abi: abiTranscaAsset,
+        functionName: "executeMint",
+        args: [reqIndex],
       });
       if (sign.hash) {
         const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: sign.hash });
@@ -181,9 +181,40 @@ const MultiSign: React.FC<{}> = () => {
     let temp = null;
     if (!assetRx.loading && assetRx.reqs.length > 0) {
       temp = assetRx.reqs.map((e, i) => {
+        console.log("e", e);
+        let totalConfirm = 0;
+        if (e.isAuditSign) {
+          totalConfirm += 1;
+        }
+        if (e.isStockerSign) {
+          totalConfirm += 1;
+        }
+        if (e.isTranscaSign) {
+          totalConfirm += 1;
+        }
         return (
           <div key={i} className="flex space-x-2">
-            <img className="w-[50px] h-[75px] border border-none rounded-xl" src={e.image} alt="asset" />
+            <div className="flex space-x-4 w-full">
+              <img className="w-[50px] h-[75px] border border-none rounded-xl" src={e.image} alt="asset" />
+              <div className="flex space-x-4 justify-center items-center">
+                <div className="text-center">
+                  <div className="text-[13px]">to</div>
+                  <div className="text-[13px] font-semibold">{truncateSuiTx(e.owner)}</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-[13px]">Appraisal price</div>
+                  <div className="text-[13px] font-semibold">{(e.appraisalPrice * 10 ** 18).toFixed(2)}$</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-[13px]">Define price</div>
+                  <div className="text-[13px] font-semibold">{(e.userDefinePrice * 10 ** 18).toFixed(2)}$</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-[13px]">Total Confirmations</div>
+                  <div className="text-[13px] font-semibold">{totalConfirm} / 3</div>
+                </div>
+              </div>
+            </div>
             {e.isAuditSign && e.isStockerSign && e.isTranscaSign ? (
               <div className="flex space-x-2 items-center">
                 <Button
@@ -236,7 +267,7 @@ const MultiSign: React.FC<{}> = () => {
       <HeaderAdmin />
       <div className="p-4 md:ml-64 mt-14 bg-gray-100 h-screen">
         <div className="bg-white px-4 py-4 border border-none rounded-xl">
-          <div>Multi-Sign</div>
+          <h1 className="text-[32px] leading-24 font-bold m-4">Confirm RWAs by Multi-Sign</h1>
           <div className="flex flex-col space-y-4">{onShowRequest()}</div>
         </div>
       </div>

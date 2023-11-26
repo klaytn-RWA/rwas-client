@@ -1,34 +1,221 @@
 // import Grow from "@mui/material/Grow";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import NFt from "../../../../public/nfts/diamond-3.png";
 import Button from "../../Button/Button";
 
+import { readContract, waitForTransaction, writeContract } from "@wagmi/core";
+import { useAccount } from "wagmi";
+import lotteryAbi from "../../../abi/Lottery.json";
+import abiUSDTSimulator from "../../../abi/USDTSimulator.json";
+
+import { ethers } from "ethers";
+import { getLotteries, selectLottery } from "../../../redux/reducers/lotteryReducer";
+import { setToast } from "../../../redux/reducers/toastReducer";
+import { useAppDispatch, useAppSelector } from "../../../redux/store";
+import { truncateEthAddress } from "../../../services/address";
 import Header from "../../Header/Header";
 
 const Lottery: React.FC<{}> = () => {
-  const [ticket, setTicket] = useState(0);
+  const [counter, setCounter] = useState(0);
+  const timer = useRef(null); // we can save timer in useRef and pass it to child
+
+  useEffect(() => {
+    // useRef value stored in .current property
+    (timer.current as any) = setInterval(() => setCounter((v) => v + 1), 2000);
+
+    return () => {
+      clearInterval(timer.current as any);
+    };
+  }, []);
+  var wsProvider = new ethers.providers.WebSocketProvider(import.meta.env.VITE_KAYTN_WSS!);
+  const contract = new ethers.Contract(import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!, lotteryAbi, wsProvider);
+  contract.on("__Update_Winner", (data) => {
+    console.log("7s200:socket:listen", data);
+  });
+
+  const { address } = useAccount();
+  const dispatch = useAppDispatch();
+  const lotteryRx = useAppSelector(selectLottery);
+  const [ticket, setTicket] = useState(-1);
+  const [isLoadingBuyTicket, setIsLoadingBuyTicket] = useState(false);
+
+  useEffect(() => {
+    dispatch(getLotteries({}));
+  }, []);
+
   const onShowNumber = () => {
     let temp: Array<any> = [];
-    for (let index = 1; index <= 5; index++) {
-      temp.push(
-        <div
-          className={`px-3 py-4 border border-2 border-purple-700 rounded-xl bg-purple-400 font-bold cursor-pointer ${ticket === index && "!border-green-500 !text-green-500"}`}
-          onClick={() => onSelectNumber(index)}
-        >
-          {index}
-        </div>,
-      );
+    if (!lotteryRx.loading && lotteryRx.lotteries.length > 0) {
+      temp = lotteryRx.lotteries[lotteryRx.lotteries.length - 1].buyers.map((e, i) => {
+        return (
+          <div
+            key={i}
+            className={`px-3 py-4 border border-2 border-purple-700 rounded-xl bg-purple-400 font-bold cursor-pointer ${
+              ticket === e.number && "!border-green-500 !text-green-500"
+            } ${e.buyer !== "0x0000000000000000000000000000000000000000" && "!bg-gray-200 !cursor-not-allowed"}`}
+            onClick={() => {
+              if (e.buyer !== "0x0000000000000000000000000000000000000000") {
+                return;
+              }
+              onSelectNumber(e.number);
+            }}
+          >
+            {e.number.toString()}
+          </div>
+        );
+      });
+    }
+
+    return temp;
+  };
+  const onShowLotteryHistories = () => {
+    let temp = null;
+    if (!lotteryRx.loading && lotteryRx.lotteries.length > 0) {
+      temp = lotteryRx.lotteries.map((e, i) => {
+        return (
+          <tr key={i} className="bg-[#251163] w-full border border-none rounded-xl text-gray-300 font-bold">
+            <td className="px-4 py-3 text-center">
+              <img className="w-[50px] h-[75px] border border-none rounded-xl" src={e.asset.image} alt="" />
+            </td>
+            <td className="px-4 py-3 text-center">{ethers.utils.formatEther(e.pricePerNumber.toString())}$</td>
+
+            <td className="px-4 py-3 text-center">{e.winner === "0x0000000000000000000000000000000000000000" ? "" : e.winNumber.toString()}</td>
+            <td className="px-4 py-3 text-center">{e.winner !== "0x0000000000000000000000000000000000000000" && truncateEthAddress(e.winner)}</td>
+          </tr>
+        );
+      });
     }
     return temp;
   };
+  const onShowEndedTag = () => {
+    if (!lotteryRx.loading && lotteryRx.lotteries[lotteryRx.lotteries.length - 1]) {
+      if (lotteryRx.lotteries[lotteryRx.lotteries.length - 1].winner !== "0x0000000000000000000000000000000000000000") {
+        return (
+          <div className="border border-4 border-red-400 rounded-2xl absolute top-1/3 -rotate-45 text-center px-2">
+            <div className="font-bold text-[50px]">Ended</div>
+            <div className="font-semibold">Winner: {lotteryRx.lotteries[lotteryRx.lotteries.length - 1].winner}</div>
+          </div>
+        );
+      }
+    }
+    return <></>;
+  };
   const onSelectNumber = (ticket: number) => {
     setTicket(ticket);
+  };
+  const onHandleBuyTicket = async () => {
+    if (ticket === -1) {
+      return;
+    }
+    setIsLoadingBuyTicket(true);
+    const lottery = await readContract({
+      address: import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!,
+      abi: lotteryAbi,
+      functionName: "getCurrentLottery",
+      args: [],
+    });
+
+    if ((lottery as any).winner !== "0x0000000000000000000000000000000000000000") {
+      setIsLoadingBuyTicket(false);
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Lottery session ended",
+          type: "info",
+        }),
+      );
+      return;
+    }
+    const data = (await readContract({
+      address: import.meta.env.VITE_TRANSCA_TOKEN_CONTRACT!,
+      abi: abiUSDTSimulator,
+      functionName: "allowance",
+      args: [address, import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!],
+    })) as bigint;
+
+    if (data < (lottery as any).pricePerNumber) {
+      if (!data) {
+        try {
+          const approve = await writeContract({
+            address: import.meta.env.VITE_TRANSCA_TOKEN_CONTRACT!,
+            abi: abiUSDTSimulator,
+            functionName: "approve",
+            args: [import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!, (lottery as any).pricePerNumber],
+          });
+
+          const data = await waitForTransaction({ hash: approve.hash });
+          if (data.status === "reverted") {
+            console.log(data);
+            dispatch(
+              setToast({
+                show: true,
+                title: "",
+                message: "Approve failed",
+                type: "error",
+              }),
+            );
+
+            setIsLoadingBuyTicket(false);
+            return;
+          }
+        } catch (error) {
+          console.error(error);
+          dispatch(
+            setToast({
+              show: true,
+              title: "",
+              message: "Approve failed",
+              type: "error",
+            }),
+          );
+
+          setIsLoadingBuyTicket(false);
+          return;
+        }
+      }
+    }
+
+    const sign = await writeContract({
+      address: import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!,
+      abi: lotteryAbi,
+      functionName: "buySlot",
+      args: [(lottery as any).id, ticket, (lottery as any).pricePerNumber],
+    });
+    if (sign.hash) {
+      const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: sign.hash });
+      if (waitTranscation.status === "success") {
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Buy ticket success",
+            type: "success",
+          }),
+        );
+        setIsLoadingBuyTicket(false);
+        dispatch(getLotteries({}));
+        setTicket(-1);
+        return;
+      } else {
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Transcation wrong!",
+            type: "error",
+          }),
+        );
+        setIsLoadingBuyTicket(false);
+        return;
+      }
+    }
   };
   return (
     <>
       <Header />
       <div className="text-white px-4 py-12 md:ml-64 mt-14 bg-gray-100 h-screen">
-        <div className="lottery-body px-4 py-4 border border-none rounded-xl flex flex-col lg:flex-row justify-between items-center space-x-4">
+        <div className="lottery-body px-4 py-4 border border-none rounded-xl flex flex-col justify-between items-center space-x-4">
           <div className=" max-w-[1300px] mx-auto flex flex-col justify-between items-center  md:flex md:flex-row space-x-12">
             <div className="px-6 lg:px-0 my-8 flex-1 flex flex-col justify-center">
               <h1 className="text-[50px] leading-[50px] font-extrabold">
@@ -46,62 +233,81 @@ const Lottery: React.FC<{}> = () => {
                 </div>
               </div>
               <div className="flex flex-col space-y-2"></div>
-              <div className="mx-auto">
-                <img src="./img/wheel-unscreen.gif" alt="wheel" />
-              </div>
+              {/* roll */}
+              {/* <div className="mx-auto">
+                <img src={"./img/wheel-unscreen.gif"} alt="wheel" />
+              </div> */}
             </div>
 
             <div className="flex max-w-[400px] justify-center items-center">
               <div>
-                <img className="max-w-[100%] max-h-[463px] boder-none rounded-xl" src={NFt} alt="nft" />
+                <div className="relative">
+                  <img
+                    className="relative max-w-[100%] max-h-[463px] boder-none rounded-xl"
+                    src={!lotteryRx.loading && lotteryRx.lotteries[lotteryRx.lotteries.length - 1] ? lotteryRx.lotteries[lotteryRx.lotteries.length - 1].asset.image : NFt}
+                    alt="nft"
+                  />
+                  {onShowEndedTag()}
+                </div>
+
                 <div className="flex flex-col space-y-3 py-2">
                   <div className="flex justify-center items-center space-x-4 z-10">
                     {/* <HomeDetailContainer title="Day" data={<LoadingV2 isLoading={contractLoading || !contractFetched}>{(Number(currentDay) + 1).toString()}</LoadingV2>} />
                     <HomeDetailContainer title="Mint Fee" data={"FREE"} />
                     <HomeDetailContainer title="Today Supply" data={<LoadingV2 isLoading={contractLoading || !contractFetched}>{`${mintPerDay}/300`}</LoadingV2>} /> */}
-                    {onShowNumber()}
+                    {lotteryRx.loading ? "..." : onShowNumber()}
                   </div>
                   <div className="mx-auto z-10">
                     <Button
                       className="cursor-pointer bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
-                      // onClick={() => onOpenPopUpCreateBundle()}
+                      onClick={() => onHandleBuyTicket()}
+                      loading={isLoadingBuyTicket}
                     >
                       Buy ticket
                     </Button>
                   </div>
-                  <div className="w-full flex justify-center items-center">
-                    {/* <ConnectButton.Custom>
-                      {({ account, chain, openConnectModal, openChainModal, authenticationStatus, mounted }) => {
-                        const ready = mounted && authenticationStatus !== "loading";
-                        const connected = ready && account && chain && (!authenticationStatus || authenticationStatus === "authenticated");
-
-                        return (
-                          <button
-                            className={`bg-btnprimary w-full text-[20px] leading-[32px] px-6 py-2 border border-none rounded-3xl flex justify-center items-center disabled:bg-gray-200 disabled:text-gray-900`}
-                            disabled={minting}
-                            onClick={() => {
-                              if (!connected) {
-                                openConnectModal();
-                              }
-
-                              if (chain?.unsupported) {
-                                openChainModal();
-                              }
-
-                              valid && mint();
-                            }}
-                          >
-                            <LoadingV2 size={30} isLoading={loading} />
-                            {!isConnected && "Connect wallet to mint"}
-                            {valid && "Mint now"}
-                            {minting && "Minting"}
-                            {chain?.unsupported && "Switch Network"}
-                          </button>
-                        );
-                      }}
-                    </ConnectButton.Custom> */}
-                  </div>
+                  <div className="w-full flex justify-center items-center"></div>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div className=" max-w-[1300px] mx-auto flex flex-col justify-between items-center  md:flex md:flex-row space-x-12">
+            <div className="max-w-[1000px] mx-auto px-6 py-16">
+              <h2 className="text-center text-[32px] leading-[32px] font-bold my-4 lg:px-20">Transca Lottery Histories</h2>
+
+              <div className="relative overflow-x-auto max-w-[700px] mx-auto border border-none rounded-xl mt-4">
+                <table className="w-full text-sm !text-white">
+                  <thead className="text-xs !text-white uppercase bg-btnprimary">
+                    <tr>
+                      <th scope="col" className="px-6 py-3 text-center">
+                        Asset
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-center">
+                        Ticket price
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-center">
+                        Win Number
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-center">
+                        Winner
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {onShowLotteryHistories()}
+                    {/* {Rates.map((e, i) => {
+                      return (
+                        <tr key={i} className="bg-[#251163] w-full border border-none rounded-xl text-gray-300">
+                          <td className="px-4 py-3 text-center">{5 - i}</td>
+
+                          <td className="px-4 py-3 text-center">{e.point}</td>
+                          <td className="px-4 py-3 text-center">{e.maximumAmount}</td>
+                          <td className="px-4 py-3 text-center">{e.possiblity}%</td>
+                        </tr>
+                      );
+                    })} */}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

@@ -16,8 +16,6 @@ const PopUpRequestHistory: React.FC<{}> = () => {
     dispatch(getRequestMint({}));
   }, [dispatch]);
 
-  console.log("7s200:asset", assetRx);
-
   const onShowReqs = () => {
     let temp = null;
     if (!assetRx.loading && assetRx.reqs.length > 0) {

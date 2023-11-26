@@ -8,6 +8,7 @@ const createStore = () => {
       asset: assetReducer,
       bundle: bundleReducer,
       intermediation: intermediationReducer,
+      lottery: lotteryReducer,
     },
   });
 };
@@ -22,6 +23,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import assetReducer from "./reducers/assetReducer";
 import bundleReducer from "./reducers/bundleReducer";
 import intermediationReducer from "./reducers/intermediationReducer";
+import lotteryReducer from "./reducers/lotteryReducer";
 
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

@@ -259,7 +259,7 @@ const PopupGetRWAsNFT: React.FC<{}> = () => {
                 abi: abiTranscaAsset,
                 functionName: "requestMintRWA",
                 args: [
-                  ethers.utils.parseUnits(weight.toString(), 18),
+                  asset_type == 0 ? ethers.utils.parseUnits(weight.toString(), 10) : ethers.utils.parseUnits(weight.toString(), 18),
                   ethers.BigNumber.from(expireTime),
                   ethers.BigNumber.from(asset_type),
                   indentifier_code,

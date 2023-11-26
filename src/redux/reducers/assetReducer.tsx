@@ -44,7 +44,7 @@ export const getAssets = createAsyncThunk("asset/get", async ({ address }: { add
       address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
       abi: abiAsset,
       functionName: "getAssetDetail",
-      args: [0],
+      args: [2],
     });
 
     const listAsset = await readContract({
@@ -127,14 +127,6 @@ export const getRequestMint = createAsyncThunk("asset/requests", async ({}: {}) 
     args: [],
   })) as Array<any>;
 
-  // const reqs2 = await readContract({
-  //   address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT! as any,
-  //   abi: abiAsset,
-  //   functionName: "audit",
-  //   args: [],
-  // });
-  // console.log(reqs2);
-
   let result: Array<MintReq> = [];
   if (reqs.length > 0) {
     for (let index = 0; index < reqs.length; index++) {
@@ -196,7 +188,6 @@ const assetReducer = createReducer(defaultAssetReducer, (builder) => {
     .addCase(getRequestMint.fulfilled, (state, action) => {
       state.loading = false;
       state.reqs = action.payload;
-      console.log("7s200:reqs", action.payload);
     })
     .addCase(getRequestMint.rejected, (state) => {
       return { ...state, loading: false };
