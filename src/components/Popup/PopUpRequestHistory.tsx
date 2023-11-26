@@ -21,6 +21,7 @@ const PopUpRequestHistory: React.FC<{}> = () => {
     if (!assetRx.loading && assetRx.reqs.length > 0) {
       temp = assetRx.reqs.map((e, i) => {
         if (address && isConnected && address === e.owner) {
+          console.log("7s200:", e.owner, e.id);
           return (
             <div key={i} className="flex space-x-2 border border-2 rounded-2xl p-4 shadow-xl my-4">
               <div className="flex justify-center space-x-2 w-1/7">

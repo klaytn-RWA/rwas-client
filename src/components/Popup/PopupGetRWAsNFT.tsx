@@ -8,6 +8,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useAccount } from "wagmi";
 import abiTranscaAsset from "../../abi/TranscaAssetNFT.json";
 import { api } from "../../config";
+import { getRequestMint } from "../../redux/reducers/assetReducer";
 import { setToast } from "../../redux/reducers/toastReducer";
 import { useAppDispatch } from "../../redux/store";
 import cn from "../../services/cn";
@@ -281,6 +282,7 @@ const PopupGetRWAsNFT: React.FC<{}> = () => {
                   );
 
                   setIsLoading(false);
+                  dispatch(getRequestMint({}));
                   removeAll();
                   return;
                 } else {
@@ -293,6 +295,8 @@ const PopupGetRWAsNFT: React.FC<{}> = () => {
                     }),
                   );
                   setIsLoading(false);
+                  dispatch(getRequestMint({}));
+
                   return;
                 }
               } else {
@@ -363,7 +367,7 @@ const PopupGetRWAsNFT: React.FC<{}> = () => {
   return (
     <Popup className="bg-gray-50 min-w-[700px]">
       <h1 className="mb-4 text-center font-bold text-[20px]" onClick={onOpenPopUpSipping}>
-        Get RWAs NFT by shiping asset
+        Get RWAs NFT by shipping asset
       </h1>
       <form onSubmit={handleSubmit(onSubmit)} className="flex justify-center space-x-2">
         <div className="w-1/2 px-6 bg-white border border-none rounded-xl shadow-xl">

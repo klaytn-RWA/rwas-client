@@ -1,21 +1,22 @@
 import { Lottery } from "@styled-icons/fluentui-system-regular";
-import { readContract, waitForTransaction, writeContract } from "@wagmi/core";
-import axios from "axios";
+import { waitForTransaction, writeContract } from "@wagmi/core";
 import { useState } from "react";
 import { useAccount, useContractReads } from "wagmi";
 import lotteryAbi from "../../../abi/Lottery.json";
 import transcaAssetAbi from "../../../abi/TranscaAssetNFT.json";
 import transcaBundleAbi from "../../../abi/TranscaBundleNFT.json";
 import transcaIAbi from "../../../abi/TranscaIntermediation.json";
-import { api } from "../../../config";
 import { setToast } from "../../../redux/reducers/toastReducer";
 import { useAppDispatch } from "../../../redux/store";
 import { truncateSuiTx } from "../../../services/address";
 import Button from "../../Button/Button";
 import HeaderAdmin from "../../Header/HeaderAdmin";
+import PopupCreateLottery from "../../Popup/PopupCreateLottery";
+import { usePopups } from "../../Popup/PopupProvider";
 
 const Admin: React.FC<{}> = () => {
   const { address } = useAccount();
+  const { addPopup } = usePopups();
   const [isLoadingCreateLottery, setIsLoadingCreateLottery] = useState(false);
   const [isLoadingUnPauseLottery, setIsLoadingUnpauseLottery] = useState(false);
   const [isLoadingSetLotteryAsset, setIsLoadingSetLotteryAsset] = useState(false);
@@ -29,87 +30,11 @@ const Admin: React.FC<{}> = () => {
 
   const dispatch = useAppDispatch();
   const onHandleCreateLottery = async () => {
-    setIsLoadingCreateLottery(true);
-    const approveData = await readContract({
-      address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
-      abi: transcaAssetAbi,
-      functionName: "isApprovedForAll",
-      args: [address, import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!],
+    return addPopup({
+      Component: () => {
+        return <PopupCreateLottery />;
+      },
     });
-    if (!approveData) {
-      try {
-        const approveAllNFTs = await writeContract({
-          address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
-          abi: transcaAssetAbi,
-          functionName: "setApprovalForAll",
-          args: [import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!, true],
-        });
-
-        const data = await waitForTransaction({ hash: approveAllNFTs.hash });
-        if (data.status === "reverted") {
-          console.log(data);
-          dispatch(
-            setToast({
-              show: true,
-              title: "",
-              message: "Approve failed",
-              type: "error",
-            }),
-          );
-
-          setIsLoadingCreateLottery(false);
-          return;
-        }
-      } catch (error) {
-        console.error(error);
-        dispatch(
-          setToast({
-            show: true,
-            title: "",
-            message: "Approve failed",
-            type: "error",
-          }),
-        );
-
-        setIsLoadingCreateLottery(false);
-        return;
-      }
-    }
-    const res = (await axios.post(
-      `${api}/v1/create-lottery`,
-      {
-        assetId: 2,
-        duration: 10000,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      },
-    )) as any;
-    console.log("7s200:res", res);
-    if (!res.error) {
-      dispatch(
-        setToast({
-          show: true,
-          title: "",
-          message: "Create Lottery success",
-          type: "success",
-        }),
-      );
-      return;
-    } else {
-      dispatch(
-        setToast({
-          show: true,
-          title: "",
-          message: "Create Lottery failed",
-          type: "error",
-        }),
-      );
-      return;
-    }
   };
   const onHandleUnPauseLottery = async () => {
     setIsLoadingUnpauseLottery(true);
@@ -834,7 +759,7 @@ const Admin: React.FC<{}> = () => {
               </div>
             </div>
 
-            <div className="flex space-x-2 py-12">
+            {/* <div className="flex space-x-2 py-12">
               <Button
                 className="cursor-pointer bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
                 onClick={() => onHandleCreateLottery()}
@@ -870,7 +795,7 @@ const Admin: React.FC<{}> = () => {
               >
                 Update Win Number
               </Button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

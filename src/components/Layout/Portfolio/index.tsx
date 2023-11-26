@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useAccount, useContractReads } from "wagmi";
 import abiAsset from "../../../abi/TranscaAssetNFT.json";
 import abiBundle from "../../../abi/TranscaBundleNFT.json";
-import { getAssets, selectAsset } from "../../../redux/reducers/assetReducer";
+import { getAssets, getRequestMint, selectAsset } from "../../../redux/reducers/assetReducer";
 import { getBundles, selectBundle } from "../../../redux/reducers/bundleReducer";
 import { selectIntermediation } from "../../../redux/reducers/intermediationReducer";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
@@ -28,7 +28,7 @@ const Portfolio: React.FC<{}> = () => {
   useEffect(() => {
     dispatch(getAssets({ address: address! }));
     dispatch(getBundles({ address: address! }));
-    // dispatch(getBorrowReqs({}));
+    dispatch(getRequestMint({}));
   }, [address, dispatch]);
 
   const { data: contract } = useContractReads({
@@ -119,14 +119,14 @@ const Portfolio: React.FC<{}> = () => {
             <div className="flex justify-between items-center space-x-2 w-[400px] bg-white drop-shadow-xl px-4 py-4 border border-none rounded-xl">
               <div className="text-[20px]">
                 <div className="text-[16px] font-normal">Total vault RWAs NFT</div>
-                <div className="font-bold">{Number(assetIds) >= 0 ? Number(assetIds) : 0}</div>
+                <div className="font-bold">{Number(assetIds) >= 0 ? Number(assetIds).toString() : 0}</div>
               </div>
               <img className="max-w-[90px] max-h-[90px]" src="/icons/bundleNFT.png" alt="nft" />
             </div>
             <div className="flex justify-between items-center space-x-2 w-[400px] bg-white drop-shadow-xl px-4 py-4 border border-none rounded-xl">
               <div className="text-[20px]">
                 <div className="text-[16px] font-normal">Total bundle RWAs NFT</div>
-                <div className="font-bold">{Number(bundleIds) >= 0 ? Number(bundleIds) : 0}</div>
+                <div className="font-bold">{Number(bundleIds) >= 0 ? Number(bundleIds).toString() : 0}</div>
               </div>
               <img className="max-w-[90px] max-h-[90px]" src="/icons/nft-box.png" alt="bundle" />
             </div>
@@ -171,12 +171,12 @@ const Portfolio: React.FC<{}> = () => {
             <div className="flex space-x-4">
               <div className="">
                 <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 !rounded-xl font-bold text-white leading-[21px]" onClick={() => onHanleOpenPopUpGetRWAsNFT()}>
-                  Get RWAs NFT
+                  Deposit Your Assest
                 </Button>
               </div>
               <div className="">
                 <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 !rounded-xl font-bold text-white leading-[21px]" onClick={() => onHandleOpenOpopUpRequestHistory()}>
-                  Your Requests
+                  Your Asset Process
                 </Button>
               </div>
             </div>

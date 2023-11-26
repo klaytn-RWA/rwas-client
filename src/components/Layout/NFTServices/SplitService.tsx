@@ -6,7 +6,7 @@ const SplitService: React.FC = () => {
     <div className="bg-white flex-1 border border-none rounded-xl shadow-xl">
       <h3 className="text-center my-4 font-extrabold text-transparent text-6xl bg-clip-text bg-gradient-to-r from-green-400 to-blue-600">Split Your NFT</h3>
       <div className="w-full mx-auto">
-        <img src="/icons/split-nft.jpeg" className="mx-auto max-w-[280px] max-h-[280px]" alt="" />
+        <img src="/icons/split-nft.png" className="mx-auto max-w-[280px] max-h-[280px]" alt="" />
       </div>
       <div className="mx-4 my-4">
         <Message

@@ -19,6 +19,7 @@ export type Asset = {
 };
 
 export type MintReq = {
+  id: number;
   appraisalPrice: number;
   assetId: number;
   assetType: number;
@@ -126,12 +127,13 @@ export const getRequestMint = createAsyncThunk("asset/requests", async ({}: {}) 
     functionName: "getAllMintRequest",
     args: [],
   })) as Array<any>;
-
+  // console.log("7s200:reqs", reqs);
   let result: Array<MintReq> = [];
   if (reqs.length > 0) {
     for (let index = 0; index < reqs.length; index++) {
       const element = reqs[index];
       let temp: MintReq = {
+        id: element.id,
         appraisalPrice: Number(ethers.utils.formatEther(element.appraisalPrice)),
         assetId: element.assetId,
         assetType: element.assetType,
@@ -152,6 +154,7 @@ export const getRequestMint = createAsyncThunk("asset/requests", async ({}: {}) 
         .catch(() => {
           return null;
         });
+
       if (response) {
         temp.image = response.image;
       }

@@ -43,8 +43,8 @@ export const getLotteries = createAsyncThunk("lottery/get", async ({}: {}, { get
         functionName: "getLottery",
         args: [index],
       })) as Lottery;
+
       if (Number(lottery.assetId) >= 0) {
-        console.log(1);
         const nftData = await readContract({
           address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
           abi: abiAsset,

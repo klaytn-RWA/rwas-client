@@ -53,6 +53,7 @@ const PopupProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
             }
             if (popups[popups.length - 1].closeWhenClickOutside === false) return;
             removePopup(popups[popups.length - 1].key);
+            removeAll();
           }}
         >
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">

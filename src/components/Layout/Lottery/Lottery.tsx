@@ -1,5 +1,5 @@
 // import Grow from "@mui/material/Grow";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import NFt from "../../../../public/nfts/diamond-3.png";
 import Button from "../../Button/Button";
 
@@ -8,29 +8,47 @@ import { useAccount } from "wagmi";
 import lotteryAbi from "../../../abi/Lottery.json";
 import abiUSDTSimulator from "../../../abi/USDTSimulator.json";
 
+import dayjs from "dayjs";
+import localizedFormat from "dayjs/plugin/localizedFormat";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { ethers } from "ethers";
 import { getLotteries, selectLottery } from "../../../redux/reducers/lotteryReducer";
 import { setToast } from "../../../redux/reducers/toastReducer";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
-import { truncateEthAddress } from "../../../services/address";
+import { truncateSuiTx } from "../../../services/address";
 import Header from "../../Header/Header";
+import Popup from "../../Popup/Popup";
+import { usePopups } from "../../Popup/PopupProvider";
+
+dayjs.extend(relativeTime);
+dayjs.extend(localizedFormat);
 
 const Lottery: React.FC<{}> = () => {
-  const [counter, setCounter] = useState(0);
-  const timer = useRef(null); // we can save timer in useRef and pass it to child
+  const { addPopup } = usePopups();
 
-  useEffect(() => {
-    // useRef value stored in .current property
-    (timer.current as any) = setInterval(() => setCounter((v) => v + 1), 2000);
-
-    return () => {
-      clearInterval(timer.current as any);
-    };
-  }, []);
   var wsProvider = new ethers.providers.WebSocketProvider(import.meta.env.VITE_KAYTN_WSS!);
   const contract = new ethers.Contract(import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!, lotteryAbi, wsProvider);
   contract.on("__Update_Winner", (data) => {
-    console.log("7s200:socket:listen", data);
+    if (data) {
+      return addPopup({
+        Component: () => {
+          return (
+            <Popup className="popupbody min-w-[800px]">
+              <h3 className="text-center my-4 font-extrabold text-transparent text-4xl bg-clip-text bg-gradient-to-r from-green-400 to-blue-600">Congratulation</h3>
+
+              <div className="flex justify-center items-center">
+                <img className="w-[150px] h-[150px]" src="./img/wheel-unscreen.gif" alt="" />
+              </div>
+              <div className="flex space-x-4 justify-center items-center w-full text-3xl">
+                <div className="text-white">Lucky number: </div>
+                <h3 className="text-center my-4 font-extrabold text-transparent text-3xl bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">#{Number(data)}</h3>
+              </div>
+            </Popup>
+          );
+        },
+      });
+    }
+    // dispatch(getLotteries({}));
   });
 
   const { address } = useAccount();
@@ -42,6 +60,7 @@ const Lottery: React.FC<{}> = () => {
   useEffect(() => {
     dispatch(getLotteries({}));
   }, []);
+  console.log("7s200:lotteryRx", lotteryRx);
 
   const onShowNumber = () => {
     let temp: Array<any> = [];
@@ -75,24 +94,25 @@ const Lottery: React.FC<{}> = () => {
         return (
           <tr key={i} className="bg-[#251163] w-full border border-none rounded-xl text-gray-300 font-bold">
             <td className="px-4 py-3 text-center">
-              <img className="w-[50px] h-[75px] border border-none rounded-xl" src={e.asset.image} alt="" />
+              <img className="w-[50px] h-[60px] border border-none rounded-xl" src={e.asset.image} alt="" />
             </td>
             <td className="px-4 py-3 text-center">{ethers.utils.formatEther(e.pricePerNumber.toString())}$</td>
-
-            <td className="px-4 py-3 text-center">{e.winner === "0x0000000000000000000000000000000000000000" ? "" : e.winNumber.toString()}</td>
-            <td className="px-4 py-3 text-center">{e.winner !== "0x0000000000000000000000000000000000000000" && truncateEthAddress(e.winner)}</td>
+            <td className="px-4 py-3 text-center">
+              {Number(e.expiredAt) < Date.now() / 1000 || e.winner !== "0x0000000000000000000000000000000000000000" ? Number(e.winNumber).toString() : ""}
+            </td>
+            <td className="px-4 py-3 text-center">{Number(e.expiredAt) < Date.now() / 1000 && truncateSuiTx(e.winner)}</td>
           </tr>
         );
       });
     }
-    return temp;
+    return temp?.reverse();
   };
   const onShowEndedTag = () => {
     if (!lotteryRx.loading && lotteryRx.lotteries[lotteryRx.lotteries.length - 1]) {
       if (lotteryRx.lotteries[lotteryRx.lotteries.length - 1].winner !== "0x0000000000000000000000000000000000000000") {
         return (
-          <div className="border border-4 border-red-400 rounded-2xl absolute top-1/3 -rotate-45 text-center px-2">
-            <div className="font-bold text-[50px]">Ended</div>
+          <div className="border border-4 border-red-400 rounded-2xl left-0 absolute top-1/3 -rotate-45 text-center px-2">
+            <div className="font-bold text-[40px]">Ended</div>
             <div className="font-semibold">Winner: {lotteryRx.lotteries[lotteryRx.lotteries.length - 1].winner}</div>
           </div>
         );
@@ -133,34 +153,20 @@ const Lottery: React.FC<{}> = () => {
       functionName: "allowance",
       args: [address, import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!],
     })) as bigint;
+    console.log("7s200:data", data);
 
     if (data < (lottery as any).pricePerNumber) {
-      if (!data) {
-        try {
-          const approve = await writeContract({
-            address: import.meta.env.VITE_TRANSCA_TOKEN_CONTRACT!,
-            abi: abiUSDTSimulator,
-            functionName: "approve",
-            args: [import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!, (lottery as any).pricePerNumber],
-          });
+      try {
+        const approve = await writeContract({
+          address: import.meta.env.VITE_TRANSCA_TOKEN_CONTRACT!,
+          abi: abiUSDTSimulator,
+          functionName: "approve",
+          args: [import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!, (lottery as any).pricePerNumber],
+        });
 
-          const data = await waitForTransaction({ hash: approve.hash });
-          if (data.status === "reverted") {
-            console.log(data);
-            dispatch(
-              setToast({
-                show: true,
-                title: "",
-                message: "Approve failed",
-                type: "error",
-              }),
-            );
-
-            setIsLoadingBuyTicket(false);
-            return;
-          }
-        } catch (error) {
-          console.error(error);
+        const data = await waitForTransaction({ hash: approve.hash });
+        if (data.status === "reverted") {
+          console.log(data);
           dispatch(
             setToast({
               show: true,
@@ -173,6 +179,19 @@ const Lottery: React.FC<{}> = () => {
           setIsLoadingBuyTicket(false);
           return;
         }
+      } catch (error) {
+        console.error(error);
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Approve failed",
+            type: "error",
+          }),
+        );
+
+        setIsLoadingBuyTicket(false);
+        return;
       }
     }
 
@@ -211,6 +230,43 @@ const Lottery: React.FC<{}> = () => {
       }
     }
   };
+  // const onShowPopUpWinner = () => {
+  //   return addPopup({
+  //     Component: () => {
+  //       return (
+  //         <Popup className="popupbody min-w-[800px]">
+  //           <h3 className="text-center my-4 font-extrabold text-transparent text-4xl bg-clip-text bg-gradient-to-r from-green-400 to-blue-600">Congratulation</h3>
+
+  //           <div className="flex justify-center items-center">
+  //             <img className="w-[150px] h-[150px]" src="./img/wheel-unscreen.gif" alt="" />
+  //           </div>
+  //           <div className="flex space-x-4 justify-center items-center w-full text-3xl">
+  //             <div className="text-white">Lucky number: </div>
+  //             <h3 className="text-center my-4 font-extrabold text-transparent text-3xl bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">#1</h3>
+  //           </div>
+  //         </Popup>
+  //       );
+  //     },
+  //   });
+  // };
+
+  const onShowCounter = () => {
+    let temp = null;
+    if (!lotteryRx.loading && lotteryRx.lotteries.length > 0 && lotteryRx.lotteries[lotteryRx.lotteries.length - 1]) {
+      const lottery = lotteryRx.lotteries[lotteryRx.lotteries.length - 1];
+      const time = dayjs(Number(lottery.expiredAt) * 1000).fromNow();
+      temp = (
+        <div className="flex justify-between space-x-2 font-bold text-24 leading-24 px-4 py-1 border border-none rounded-2xl bg-blue-500 w-2/3">
+          <div>Lottery Ended At:</div>
+          <div className="font-semibold">
+            {time.toString()} {Number(lottery.expiredAt) * 1000 < Date.now() && "(Ended)"}
+          </div>
+        </div>
+      );
+    }
+    return temp;
+  };
+
   return (
     <>
       <Header />
@@ -225,12 +281,16 @@ const Lottery: React.FC<{}> = () => {
               </h1>
               <div className="flex flex-col space-y-2 lg:flex lg:flex-row justify-center items-center space-x-6 py-6">
                 <div className="text-[16px] leading-[26px]">
-                  <p className="pb-4 mt-12">We believe that each NFT artwork represents the creativity and soul of the creator, and this deserves to be clearly expressed.</p>
+                  {/* <p className="pb-4 mt-12">We believe that each NFT artwork represents the creativity and soul of the creator, and this deserves to be clearly expressed.</p> */}
                   <p>
-                    The POINT of each NFT will be displayed in the order the users mint them, and there will be a leaderboard for POINT's owners, and we will have rewards for the
-                    top 5 users with the highest points.
+                    Transca will generate a specific number of tickets for each asset, with the total value of these tickets matching the asset's prize value. The lottery winner
+                    will be awarded an NFT representing the asset through a Smart Contract.
                   </p>
                 </div>
+              </div>
+              <div>
+                {onShowCounter()}
+                {/* {!lotteryRx.loading && lotteryRx.lotteries.length > 0 && lotteryRx.lotteries[lotteryRx.lotteries.length - 1] ? <div>Counter {Timer(1701505682)}</div> : <></>} */}
               </div>
               <div className="flex flex-col space-y-2"></div>
               {/* roll */}
