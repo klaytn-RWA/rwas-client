@@ -16,7 +16,9 @@ const NFTCard: React.FC<{ nftData: Asset }> = ({ nftData }) => {
               </div>
             )}
             {Number(asset.appraisalPrice) > 0 && (
-              <div className="bg-blue-600 text-white text-sm font-bold m-2 w-fit px-2 border border-none rounded-2xl">{Number(asset.appraisalPrice!).toFixed(2).toString()} $</div>
+              <div className="bg-blue-600 text-white text-sm font-bold m-2 w-fit px-2 border border-none rounded-2xl">
+                {Number(ethers.utils.formatUnits(asset.appraisalPrice!, 18)).toFixed(2).toString()} $
+              </div>
             )}
           </div>
           <div className="nft-back text-[12px]">
@@ -27,16 +29,16 @@ const NFTCard: React.FC<{ nftData: Asset }> = ({ nftData }) => {
               </div>
               <div className="flex space-x-1">
                 <div>Price define:</div>
-                <div className="font-semibold">{asset.userDefinePrice!.toString()}$</div>
+                <div className="font-semibold">{Number(ethers.utils.formatUnits(asset.userDefinePrice!, 18)).toFixed(2).toString()}$</div>
               </div>
               <div className="flex space-x-1">
                 <div>Price appraisal:</div>
-                <div className="font-semibold">{asset.appraisalPrice!.toString()}$</div>
+                <div className="font-semibold">{Number(ethers.utils.formatUnits(asset.appraisalPrice!, 18)).toFixed(2).toString()}$</div>
               </div>
               <div className="flex space-x-1">
                 <div>Weight:</div>
                 <div className="font-semibold">
-                  {ethers.utils.formatUnits(asset.weight!, 10).toString()} <span> {asset.assetType === 0 && "ounce"}</span>
+                  {ethers.utils.formatUnits(asset.weight!, asset.assetType === 0 ? 10 : 18).toString()} <span> {asset.assetType === 0 && "ounce"}</span>
                 </div>
               </div>
               <div className="flex space-x-1">

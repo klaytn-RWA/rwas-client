@@ -45,7 +45,7 @@ export const getAssets = createAsyncThunk("asset/get", async ({ address }: { add
       address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
       abi: abiAsset,
       functionName: "getAssetDetail",
-      args: [2],
+      args: [0],
     });
 
     const listAsset = await readContract({
@@ -55,7 +55,7 @@ export const getAssets = createAsyncThunk("asset/get", async ({ address }: { add
       args: [address!],
     });
 
-    console.log("7s200:ass", listAsset);
+    // console.log("7s200:ass", listAsset);
 
     if (!listAsset || (listAsset as Array<Asset>).length === 0) {
       return [];
@@ -85,7 +85,7 @@ export const getAssets = createAsyncThunk("asset/get", async ({ address }: { add
       return list;
     }
   } catch (error: any) {
-    console.error(error);
+    // console.error(error);
     return [];
   }
 });

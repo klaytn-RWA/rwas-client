@@ -80,15 +80,15 @@ const PopupCreateLottery: React.FC<{}> = () => {
     if (!assetRx.loading && assetRx.assets.length > 0) {
       temp = assetRx.assets.map((e, i) => {
         return (
-          <tr key={i} className={`bg-[#251163] w-full border border-none rounded-xl text-gray-300 cursor-pointer`} onClick={() => onSelectNFT(Number(e.assetId))}>
+          <tr key={i} className={`bg-[#251163] w-full text-gray-300 cursor-pointer`} onClick={() => onSelectNFT(Number(e.assetId))}>
             <td className="px-4 py-3 text-center">
               <div>
                 <img className="max-w-[50px] max-h-[50px] border border-none rounded-xl" src={e.image} alt="nft" />
               </div>
             </td>
             <td className="px-4 py-3 text-center">{Number(ethers.utils.formatUnits(e.oraklPrice, 18)).toFixed(2)}</td>
-            <td className="px-4 py-3 text-center">{Number(e.appraisalPrice).toFixed(2)}</td>
-            <td className="px-4 py-3 text-center">{Number(e.userDefinePrice).toFixed(2)}</td>
+            <td className="px-4 py-3 text-center">{Number(ethers.utils.formatUnits(e.appraisalPrice, 18)).toFixed(2)}</td>
+            <td className="px-4 py-3 text-center">{Number(ethers.utils.formatUnits(e.userDefinePrice, 18)).toFixed(2)}</td>
             <td className="px-4 py-3 text-center">{Number(e.assetId) === selected && <CheckCircleFill size={20} color="green" />}</td>
           </tr>
         );
@@ -192,13 +192,12 @@ const PopupCreateLottery: React.FC<{}> = () => {
       <form className="flex justify-center space-x-2">
         <div className="w-2/3 px-6 bg-white border border-none rounded-xl shadow-xl">
           <div className="py-1 flex justify-center items-center h-full">
-            <table className="w-full text-sm !text-white">
+            <table className="w-full text-sm !text-white border border-none rounded-xl">
               <thead className="text-xs !text-white uppercase bg-btnprimary">
                 <tr>
                   <th scope="col" className="px-6 py-3 text-center">
                     NFT
                   </th>
-
                   <th scope="col" className="px-6 py-3 text-center">
                     Real Time Price
                   </th>

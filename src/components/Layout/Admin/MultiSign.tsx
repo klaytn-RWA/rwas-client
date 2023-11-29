@@ -203,11 +203,13 @@ const MultiSign: React.FC<{}> = () => {
                 </div>
                 <div className="text-center">
                   <div className="text-[13px]">Appraisal price</div>
-                  <div className="text-[13px] font-semibold">{(e.appraisalPrice * 10 ** 18).toFixed(2)}$</div>
+                  {/* <div className="text-[13px] font-semibold">{(e.appraisalPrice * 10 ** 18).toFixed(2)}$</div> */}
+                  <div className="text-[13px] font-semibold">{e.appraisalPrice}$</div>
                 </div>
                 <div className="text-center">
                   <div className="text-[13px]">Define price</div>
-                  <div className="text-[13px] font-semibold">{(e.userDefinePrice * 10 ** 18).toFixed(2)}$</div>
+                  {/* <div className="text-[13px] font-semibold">{(e.userDefinePrice * 10 ** 18).toFixed(2)}$</div> */}
+                  <div className="text-[13px] font-semibold">{e.userDefinePrice}$</div>
                 </div>
                 <div className="text-center">
                   <div className="text-[13px]">Total Confirmations</div>

@@ -32,6 +32,8 @@ const Admin: React.FC<{}> = () => {
   const [isLoadingSetIntermediationAsset, setIsLoadingSetIntermediationAsset] = useState(false);
   const [isLoadingSetIntermediationBundle, setIsLoadingSetIntermediationBundle] = useState(false);
 
+  const [isLoadingSetMultiSign, setIsLoadingSetMiltiSign] = useState(false);
+
   const dispatch = useAppDispatch();
   const onHandleCreateLottery = async () => {
     return addPopup({
@@ -250,7 +252,6 @@ const Admin: React.FC<{}> = () => {
       }
     }
   };
-  const onHandleSetMultiSign = async () => {};
 
   const onHandleUnPauseBundle = async () => {
     setIsLoadingUnpauseTranscaBundle(true);
@@ -463,6 +464,42 @@ const Admin: React.FC<{}> = () => {
     }
   };
 
+  const onHandleSetMultiSign = async () => {
+    setIsLoadingSetMiltiSign(true);
+    const sign = await writeContract({
+      address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
+      abi: transcaAssetAbi,
+      functionName: "setOwnerMultiSign",
+      args: ["0x5ABC8C40a8b7AD099876c6e5a8CA0F9BBc5cA627", "0xd01d903011fd0dfd473220994c6fca9755848c22", "0x294003a3Dcf34B046D367147752e2B57141ABc6C"],
+    });
+    if (sign.hash) {
+      const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: sign.hash });
+      if (waitTranscation.status === "success") {
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Unpause Transca multi-sign success",
+            type: "success",
+          }),
+        );
+        setIsLoadingSetMiltiSign(false);
+        return;
+      } else {
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Transcation wrong!",
+            type: "error",
+          }),
+        );
+        setIsLoadingSetMiltiSign(false);
+        return;
+      }
+    }
+  };
+
   const { data, isError, isLoading } = useContractReads({
     contracts: [
       // 0
@@ -550,7 +587,7 @@ const Admin: React.FC<{}> = () => {
         functionName: "transca",
       },
     ],
-    // watch: true,
+    watch: true,
   });
   const isTranscaAssetPaused = data ? data![0].result : 0;
   const isTranscaBundlePaused = data ? data![1].result : 0;
@@ -566,7 +603,7 @@ const Admin: React.FC<{}> = () => {
   const auditor = data ? data![11].result : "0x0000000000000000000000000000000000000000";
   const stocker = data ? data![12].result : "0x0000000000000000000000000000000000000000";
   const transca = data ? data![13].result : "0x0000000000000000000000000000000000000000";
-  console.log("7s200:transca", transca);
+
   return (
     <>
       <HeaderAdmin />
@@ -650,10 +687,10 @@ const Admin: React.FC<{}> = () => {
                           <Button
                             className="cursor-pointer bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
                             size="small"
-                            // onClick={() => onHandleCreateLottery()}
-                            // loading={isLoadingCreateLottery}
+                            onClick={() => onHandleSetMultiSign()}
+                            loading={isLoadingSetMultiSign}
                           >
-                            Set auditor
+                            Set Multi-Sign
                           </Button>
                         </td>
                       </tr>
@@ -664,10 +701,10 @@ const Admin: React.FC<{}> = () => {
                           <Button
                             className="cursor-pointer bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
                             size="small"
-                            // onClick={() => onHandleCreateLottery()}
-                            // loading={isLoadingCreateLottery}
+                            onClick={() => onHandleSetMultiSign()}
+                            loading={isLoadingSetMultiSign}
                           >
-                            Set stocker
+                            Set Multi-Sign
                           </Button>
                         </td>
                       </tr>
@@ -678,10 +715,10 @@ const Admin: React.FC<{}> = () => {
                           <Button
                             className="cursor-pointer bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
                             size="small"
-                            // onClick={() => onHandleCreateLottery()}
-                            // loading={isLoadingCreateLottery}
+                            onClick={() => onHandleSetMultiSign()}
+                            loading={isLoadingSetMultiSign}
                           >
-                            Set transca
+                            Set Multi-Sign
                           </Button>
                         </td>
                       </tr>

@@ -265,8 +265,10 @@ const PopupGetRWAsNFT: React.FC<{}> = () => {
                   ethers.BigNumber.from(asset_type),
                   indentifier_code,
                   ipfs_hash,
-                  ethers.BigNumber.from(user_define_price),
-                  ethers.BigNumber.from(appraisal_price),
+                  ethers.utils.parseUnits(user_define_price.toString(), 18),
+                  // ethers.BigNumber.from(user_define_price),
+                  ethers.utils.parseUnits(appraisal_price.toString(), 18),
+                  // ethers.BigNumber.from(appraisal_price),
                 ],
               });
               if (requestCreateMintRWAs.hash) {
