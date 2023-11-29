@@ -275,8 +275,7 @@ const Lottery: React.FC<{}> = () => {
     watch: true,
 
     onSuccess: (data) => {
-      console.log("7s200:data");
-      if ((data as any).isSuccess === true && Number((data as any).expiredAt) + 5 > Date.now() / 1000) {
+      if ((data as any).isSuccess === true && Number((data as any).expiredAt) + 50 > Date.now() / 1000) {
         return addPopup({
           Component: () => {
             return (
