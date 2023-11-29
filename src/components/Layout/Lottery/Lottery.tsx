@@ -155,7 +155,7 @@ const Lottery: React.FC<{}> = () => {
     })) as bigint;
     console.log("7s200:data", data);
 
-    if (data <= (lottery as any).pricePerNumber) {
+    if (Number(data) <= Number((lottery as any).pricePerNumber)) {
       try {
         const approve = await writeContract({
           address: import.meta.env.VITE_TRANSCA_TOKEN_CONTRACT!,
