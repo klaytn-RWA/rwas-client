@@ -1,4 +1,4 @@
-import { Lottery } from "@styled-icons/fluentui-system-regular";
+import { Copy, Lottery } from "@styled-icons/fluentui-system-regular";
 import { waitForTransaction, writeContract } from "@wagmi/core";
 import { useState } from "react";
 import { useAccount, useContractReads } from "wagmi";
@@ -8,7 +8,7 @@ import transcaBundleAbi from "../../../abi/TranscaBundleNFT.json";
 import transcaIAbi from "../../../abi/TranscaIntermediation.json";
 import { setToast } from "../../../redux/reducers/toastReducer";
 import { useAppDispatch } from "../../../redux/store";
-import { truncateSuiTx } from "../../../services/address";
+import { truncateEthAddress, truncateSuiTx } from "../../../services/address";
 import Button from "../../Button/Button";
 import HeaderAdmin from "../../Header/HeaderAdmin";
 import PopupCreateLottery from "../../Popup/PopupCreateLottery";
@@ -27,6 +27,10 @@ const Admin: React.FC<{}> = () => {
   const [isLoadingUnpauseTranscaBundle, setIsLoadingUnpauseTranscaBundle] = useState(false);
   const [isLoadingSetTranscaAssetBundle, setIsLoadingSetTranscaAssetBundle] = useState(false);
   const [isLoadingSetUnpauseIntermediation, setIsLoadingUnpauseIntermediation] = useState(false);
+
+  const [isLoadingSetIntermediationToken, setIsLoadingSetIntermediationToken] = useState(false);
+  const [isLoadingSetIntermediationAsset, setIsLoadingSetIntermediationAsset] = useState(false);
+  const [isLoadingSetIntermediationBundle, setIsLoadingSetIntermediationBundle] = useState(false);
 
   const dispatch = useAppDispatch();
   const onHandleCreateLottery = async () => {
@@ -77,7 +81,7 @@ const Admin: React.FC<{}> = () => {
       address: import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!,
       abi: lotteryAbi,
       functionName: "setAsset",
-      args: [import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!],
+      args: [import.meta.env.VITE_TRANSCA_ASSET_CONTRACT as any],
     });
     if (sign.hash) {
       const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: sign.hash });
@@ -112,7 +116,7 @@ const Admin: React.FC<{}> = () => {
       address: import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!,
       abi: lotteryAbi,
       functionName: "setToken",
-      args: [import.meta.env.VITE_TRANSCA_TOKEN_CONTRACT!],
+      args: [import.meta.env.VITE_TRANSCA_TOKEN_CONTRACT as any],
     });
     if (sign.hash) {
       const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: sign.hash });
@@ -217,7 +221,7 @@ const Admin: React.FC<{}> = () => {
       address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
       abi: transcaAssetAbi,
       functionName: "setAggregator",
-      args: [import.meta.env.VITE_TRANSCA_ORAKL_AGGREGATOR!],
+      args: [import.meta.env.VITE_TRANSCA_ORAKL_AGGREGATOR as any],
     });
     if (sign.hash) {
       const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: sign.hash });
@@ -289,7 +293,7 @@ const Admin: React.FC<{}> = () => {
       address: import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT!,
       abi: transcaBundleAbi,
       functionName: "setAsset",
-      args: [import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!],
+      args: [import.meta.env.VITE_TRANSCA_ASSET_CONTRACT as any],
     });
     if (sign.hash) {
       const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: sign.hash });
@@ -353,80 +357,200 @@ const Admin: React.FC<{}> = () => {
       }
     }
   };
+  const onHandleSetIntermediationToken = async () => {
+    setIsLoadingSetIntermediationToken(true);
+    const sign = await writeContract({
+      address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT!,
+      abi: transcaIAbi,
+      functionName: "setToken",
+      args: [import.meta.env.VITE_TRANSCA_TOKEN_CONTRACT as any],
+    });
+    if (sign.hash) {
+      const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: sign.hash });
+      if (waitTranscation.status === "success") {
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Set token success",
+            type: "success",
+          }),
+        );
+        setIsLoadingSetIntermediationToken(false);
+        return;
+      } else {
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Transcation wrong!",
+            type: "error",
+          }),
+        );
+        setIsLoadingSetIntermediationToken(false);
+        return;
+      }
+    }
+  };
+  const onHandleSetIntermediationAsset = async () => {
+    setIsLoadingSetIntermediationAsset(true);
+    const sign = await writeContract({
+      address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT!,
+      abi: transcaIAbi,
+      functionName: "setAsset",
+      args: [import.meta.env.VITE_TRANSCA_ASSET_CONTRACT as any],
+    });
+    if (sign.hash) {
+      const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: sign.hash });
+      if (waitTranscation.status === "success") {
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Set asset success",
+            type: "success",
+          }),
+        );
+        setIsLoadingSetIntermediationAsset(false);
+        return;
+      } else {
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Transcation wrong!",
+            type: "error",
+          }),
+        );
+        setIsLoadingSetIntermediationAsset(false);
+        return;
+      }
+    }
+  };
+  const onHandleSetIntermediationBundle = async () => {
+    setIsLoadingSetIntermediationBundle(true);
+    const sign = await writeContract({
+      address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT!,
+      abi: transcaIAbi,
+      functionName: "setBundle",
+      args: [import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT as any],
+    });
+    if (sign.hash) {
+      const waitTranscation = await waitForTransaction({ chainId: import.meta.env.VITE_CHAIN_ID!, hash: sign.hash });
+      if (waitTranscation.status === "success") {
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Set bundle success",
+            type: "success",
+          }),
+        );
+        setIsLoadingSetIntermediationBundle(false);
+        return;
+      } else {
+        dispatch(
+          setToast({
+            show: true,
+            title: "",
+            message: "Transcation wrong!",
+            type: "error",
+          }),
+        );
+        setIsLoadingSetIntermediationBundle(false);
+        return;
+      }
+    }
+  };
 
   const { data, isError, isLoading } = useContractReads({
     contracts: [
+      // 0
       {
         address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
         abi: transcaAssetAbi as any,
         functionName: "paused",
       },
+      // 1
       {
         address: import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT!,
         abi: transcaBundleAbi as any,
         functionName: "paused",
       },
+      // 2
       {
         address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT!,
         abi: transcaIAbi as any,
         functionName: "paused",
       },
+      // 3
       {
         address: import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!,
         abi: lotteryAbi as any,
         functionName: "paused",
       },
+      // 4
       {
         address: import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!,
         abi: lotteryAbi as any,
         functionName: "assetNft",
       },
+      // 5
       {
         address: import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!,
         abi: lotteryAbi as any,
         functionName: "token",
       },
+      // 6
       {
         address: import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT!,
         abi: lotteryAbi as any,
         functionName: "assetNft",
       },
+      // 7
       {
         address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT!,
         abi: transcaIAbi as any,
         functionName: "assetNft",
       },
+      // 8
       {
         address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT!,
         abi: transcaIAbi as any,
         functionName: "bundleNft",
       },
+      // 9
       {
         address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT!,
         abi: transcaIAbi as any,
         functionName: "token",
       },
+      // 10
       {
         address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
         abi: transcaAssetAbi as any,
         functionName: "getLatestData",
       },
+      // 11
       {
         address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
         abi: transcaAssetAbi as any,
         functionName: "audit",
       },
+      // 12
       {
         address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
         abi: transcaAssetAbi as any,
         functionName: "stocker",
       },
+      // 13
       {
         address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
         abi: transcaAssetAbi as any,
         functionName: "transca",
       },
     ],
+    // watch: true,
   });
   const isTranscaAssetPaused = data ? data![0].result : 0;
   const isTranscaBundlePaused = data ? data![1].result : 0;
@@ -442,7 +566,7 @@ const Admin: React.FC<{}> = () => {
   const auditor = data ? data![11].result : "0x0000000000000000000000000000000000000000";
   const stocker = data ? data![12].result : "0x0000000000000000000000000000000000000000";
   const transca = data ? data![13].result : "0x0000000000000000000000000000000000000000";
-
+  console.log("7s200:transca", transca);
   return (
     <>
       <HeaderAdmin />
@@ -451,7 +575,29 @@ const Admin: React.FC<{}> = () => {
           <div className="w-full flex flex-col space-y-6">
             <div className="w-full flex flex-col justify-center space-y-4 lg:flex-row lg:space-y-0 lg:space-x-4">
               <div className="">
-                <h1 className="text-32 leading-24 font-bold mx-4">Transca Asset Contract</h1>
+                <h1 className="text-32 leading-24 font-bold mx-4">
+                  Transca Asset Contract:{" "}
+                  <span className="text-[13px] font-semibold">
+                    {truncateEthAddress(import.meta.env.VITE_TRANSCA_ASSET_CONTRACT)}{" "}
+                    {
+                      <Copy
+                        className="cursor-pointer"
+                        size={16}
+                        onClick={() => {
+                          navigator.clipboard.writeText(import.meta.env.VITE_TRANSCA_ASSET_CONTRACT);
+                          dispatch(
+                            setToast({
+                              show: true,
+                              title: "",
+                              message: "Copy success",
+                              type: "success",
+                            }),
+                          );
+                        }}
+                      />
+                    }
+                  </span>
+                </h1>
                 <div className="overflow-x-auto max-w-[550px] mx-auto border border-none rounded-xl mt-4">
                   <table className="w-full text-sm !text-white">
                     <thead className="text-xs !text-white uppercase bg-btnprimary">
@@ -544,7 +690,29 @@ const Admin: React.FC<{}> = () => {
                 </div>
               </div>
               <div className="">
-                <h1 className="text-32 leading-24 font-bold mx-4">Lottery Contract</h1>
+                <h1 className="text-32 leading-24 font-bold mx-4">
+                  Lottery Contract:{" "}
+                  <span className="text-[13px] font-semibold">
+                    {truncateEthAddress(import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT)}{" "}
+                    {
+                      <Copy
+                        className="cursor-pointer"
+                        size={16}
+                        onClick={() => {
+                          navigator.clipboard.writeText(import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT);
+                          dispatch(
+                            setToast({
+                              show: true,
+                              title: "",
+                              message: "Copy success",
+                              type: "success",
+                            }),
+                          );
+                        }}
+                      />
+                    }
+                  </span>
+                </h1>
                 <div className="overflow-x-auto max-w-[550px] mx-auto border border-none rounded-xl mt-4">
                   <table className="w-full text-sm !text-white">
                     <thead className="text-xs !text-white uppercase bg-btnprimary">
@@ -624,7 +792,29 @@ const Admin: React.FC<{}> = () => {
 
             <div className="w-full flex flex-col justify-center space-y-4 lg:flex-row lg:space-y-0 lg:space-x-4">
               <div>
-                <h1 className="text-32 leading-24 font-bold mx-4">Bundle Contract</h1>
+                <h1 className="text-32 leading-24 font-bold mx-4">
+                  Bundle Contract{" "}
+                  <span className="text-[13px] font-semibold">
+                    {truncateEthAddress(import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT)}{" "}
+                    {
+                      <Copy
+                        className="cursor-pointer"
+                        size={16}
+                        onClick={() => {
+                          navigator.clipboard.writeText(import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT);
+                          dispatch(
+                            setToast({
+                              show: true,
+                              title: "",
+                              message: "Copy success",
+                              type: "success",
+                            }),
+                          );
+                        }}
+                      />
+                    }
+                  </span>
+                </h1>
                 <div className="overflow-x-auto max-w-[550px] mx-auto border border-none rounded-xl mt-4">
                   <table className="w-full text-sm !text-white">
                     <thead className="text-xs !text-white uppercase bg-btnprimary">
@@ -676,7 +866,30 @@ const Admin: React.FC<{}> = () => {
                 </div>
               </div>
               <div>
-                <h1 className="text-32 leading-24 font-bold mx-4">Intermediation Contract</h1>
+                <h1 className="text-32 leading-24 font-bold mx-4">
+                  Intermediation Contract{" "}
+                  <span className="text-[13px] font-semibold">
+                    {truncateEthAddress(import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT)}{" "}
+                    {
+                      <Copy
+                        className="cursor-pointer"
+                        size={16}
+                        onClick={() => {
+                          navigator.clipboard.writeText(import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT);
+                          dispatch(
+                            setToast({
+                              show: true,
+                              title: "",
+                              message: "Copy success",
+                              type: "success",
+                            }),
+                          );
+                        }}
+                      />
+                    }
+                  </span>
+                </h1>
+
                 <div className="overflow-x-auto max-w-[550px] mx-auto border border-none rounded-xl mt-4">
                   <table className="w-full text-sm !text-white">
                     <thead className="text-xs !text-white uppercase bg-btnprimary">
@@ -716,8 +929,8 @@ const Admin: React.FC<{}> = () => {
                           <Button
                             className="cursor-pointer bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
                             size="small"
-                            // onClick={() => onHandleCreateLottery()}
-                            // loading={isLoadingCreateLottery}
+                            onClick={() => onHandleSetIntermediationAsset()}
+                            loading={isLoadingSetIntermediationAsset}
                           >
                             Set Asset
                           </Button>
@@ -731,8 +944,8 @@ const Admin: React.FC<{}> = () => {
                           <Button
                             className="cursor-pointer bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
                             size="small"
-                            // onClick={() => onHandleCreateLottery()}
-                            // loading={isLoadingCreateLottery}
+                            onClick={() => onHandleSetIntermediationBundle()}
+                            loading={isLoadingSetIntermediationBundle}
                           >
                             Set Bundle
                           </Button>
@@ -746,8 +959,8 @@ const Admin: React.FC<{}> = () => {
                           <Button
                             className="cursor-pointer bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-3xl font-bold text-white min-w-[200px] leading-[21px]"
                             size="small"
-                            // onClick={() => onHandleCreateLottery()}
-                            // loading={isLoadingCreateLottery}
+                            onClick={() => onHandleSetIntermediationToken()}
+                            loading={isLoadingSetIntermediationToken}
                           >
                             Set Token
                           </Button>

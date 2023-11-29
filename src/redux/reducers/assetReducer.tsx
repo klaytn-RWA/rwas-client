@@ -55,6 +55,8 @@ export const getAssets = createAsyncThunk("asset/get", async ({ address }: { add
       args: [address!],
     });
 
+    console.log("7s200:ass", listAsset);
+
     if (!listAsset || (listAsset as Array<Asset>).length === 0) {
       return [];
     } else {
@@ -127,7 +129,7 @@ export const getRequestMint = createAsyncThunk("asset/requests", async ({}: {}) 
     functionName: "getAllMintRequest",
     args: [],
   })) as Array<any>;
-  // console.log("7s200:reqs", reqs);
+  console.log("7s200:reqs", reqs);
   let result: Array<MintReq> = [];
   if (reqs.length > 0) {
     for (let index = 0; index < reqs.length; index++) {
