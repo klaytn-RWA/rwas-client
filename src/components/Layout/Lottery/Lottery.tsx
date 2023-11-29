@@ -4,7 +4,7 @@ import NFt from "../../../../public/nfts/diamond-3.png";
 import Button from "../../Button/Button";
 
 import { readContract, waitForTransaction, writeContract } from "@wagmi/core";
-import { useAccount } from "wagmi";
+import { useAccount, useContractRead } from "wagmi";
 import lotteryAbi from "../../../abi/Lottery.json";
 import abiUSDTSimulator from "../../../abi/USDTSimulator.json";
 
@@ -26,30 +26,30 @@ dayjs.extend(localizedFormat);
 const Lottery: React.FC<{}> = () => {
   const { addPopup } = usePopups();
 
-  var wsProvider = new ethers.providers.WebSocketProvider(import.meta.env.VITE_KAYTN_WSS!);
-  const contract = new ethers.Contract(import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!, lotteryAbi, wsProvider);
-  contract.on("__Update_Winner", (data) => {
-    if (data) {
-      return addPopup({
-        Component: () => {
-          return (
-            <Popup className="popupbody min-w-[800px]">
-              <h3 className="text-center my-4 font-extrabold text-transparent text-4xl bg-clip-text bg-gradient-to-r from-green-400 to-blue-600">Congratulation</h3>
+  // var wsProvider = new ethers.providers.WebSocketProvider(import.meta.env.VITE_KAYTN_WSS!);
+  // const contract = new ethers.Contract(import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!, lotteryAbi, wsProvider);
+  // contract.on("__Update_Winner", (data) => {
+  //   if (data) {
+  //     return addPopup({
+  //       Component: () => {
+  //         return (
+  //           <Popup className="popupbody min-w-[800px]">
+  //             <h3 className="text-center my-4 font-extrabold text-transparent text-4xl bg-clip-text bg-gradient-to-r from-green-400 to-blue-600">Congratulation</h3>
 
-              <div className="flex justify-center items-center">
-                <img className="w-[150px] h-[150px]" src="./img/wheel-unscreen.gif" alt="" />
-              </div>
-              <div className="flex space-x-4 justify-center items-center w-full text-3xl">
-                <div className="text-white">Lucky number: </div>
-                <h3 className="text-center my-4 font-extrabold text-transparent text-3xl bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">#{Number(data)}</h3>
-              </div>
-            </Popup>
-          );
-        },
-      });
-    }
-    // dispatch(getLotteries({}));
-  });
+  //             <div className="flex justify-center items-center">
+  //               <img className="w-[150px] h-[150px]" src="./img/wheel-unscreen.gif" alt="" />
+  //             </div>
+  //             <div className="flex space-x-4 justify-center items-center w-full text-3xl">
+  //               <div className="text-white">Lucky number: </div>
+  //               <h3 className="text-center my-4 font-extrabold text-transparent text-3xl bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">#{Number(data)}</h3>
+  //             </div>
+  //           </Popup>
+  //         );
+  //       },
+  //     });
+  //   }
+  //   // dispatch(getLotteries({}));
+  // });
 
   const { address } = useAccount();
   const dispatch = useAppDispatch();
@@ -60,7 +60,7 @@ const Lottery: React.FC<{}> = () => {
   useEffect(() => {
     dispatch(getLotteries({}));
   }, []);
-  console.log("7s200:lotteryRx", lotteryRx);
+  // console.log("7s200:lotteryRx", lotteryRx);
 
   const onShowNumber = () => {
     let temp: Array<any> = [];
@@ -266,6 +266,39 @@ const Lottery: React.FC<{}> = () => {
     }
     return temp;
   };
+
+  const {} = useContractRead({
+    address: import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!,
+    abi: lotteryAbi,
+    functionName: "getCurrentLottery",
+    args: [],
+    watch: true,
+
+    onSuccess: (data) => {
+      console.log("7s200:data");
+      if ((data as any).isSuccess === true && Number((data as any).expiredAt) + 5 > Date.now() / 1000) {
+        return addPopup({
+          Component: () => {
+            return (
+              <Popup className="popupbody min-w-[800px]">
+                <h3 className="text-center my-4 font-extrabold text-transparent text-4xl bg-clip-text bg-gradient-to-r from-green-400 to-blue-600">Congratulation</h3>
+
+                <div className="flex justify-center items-center">
+                  <img className="w-[150px] h-[150px]" src="./img/wheel-unscreen.gif" alt="" />
+                </div>
+                <div className="flex space-x-4 justify-center items-center w-full text-3xl">
+                  <div className="text-white">Lucky number: </div>
+                  <h3 className="text-center my-4 font-extrabold text-transparent text-3xl bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+                    #{Number((data as any).winNumber)}
+                  </h3>
+                </div>
+              </Popup>
+            );
+          },
+        });
+      }
+    },
+  });
 
   return (
     <>

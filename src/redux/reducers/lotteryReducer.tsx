@@ -15,6 +15,7 @@ export type Lottery = {
   totalNumber: any;
   winNumber: any;
   winner: string;
+  isSuccess: boolean;
   buyers: Array<Buyer>;
   asset: Asset;
 };
