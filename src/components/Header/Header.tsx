@@ -1,6 +1,8 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ShopWindow } from "@styled-icons/bootstrap";
 import { History } from "@styled-icons/boxicons-regular";
-import { ExchangeFunds } from "@styled-icons/remix-fill";
+import { AdminPanelSettings } from "@styled-icons/material-outlined";
+import { Auction, ExchangeFunds } from "@styled-icons/remix-fill";
 import { HandCoin } from "@styled-icons/remix-line";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -36,6 +38,11 @@ const Header: React.FC<{}> = () => {
         return <PopupGetRWAsNFT />;
       },
     });
+  };
+
+  const openInNewTab = (url: string) => {
+    const newWindow = window.open(url, "_blank", "noopener,noreferrer");
+    if (newWindow) newWindow.opener = null;
   };
 
   return (
@@ -145,7 +152,7 @@ const Header: React.FC<{}> = () => {
               >
                 <HandCoin size={24} />
                 <span className="flex-1 ml-3 whitespace-nowrap">Borrow</span>
-                <span className="inline-flex items-center justify-center w-3 h-3 p-3 ml-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">3</span>
+                {/* <span className="inline-flex items-center justify-center w-3 h-3 p-3 ml-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full"></span> */}
               </div>
             </li>
             <li>
@@ -157,7 +164,7 @@ const Header: React.FC<{}> = () => {
               >
                 <ExchangeFunds size={24} />
                 <span className="flex-1 ml-3 whitespace-nowrap">Lend</span>
-                <span className="inline-flex items-center justify-center w-3 h-3 p-3 ml-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">3</span>
+                {/* <span className="inline-flex items-center justify-center w-3 h-3 p-3 ml-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full"></span> */}
               </div>
             </li>
             <li>
@@ -178,25 +185,39 @@ const Header: React.FC<{}> = () => {
                 }}
                 className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100  group ${data.pathname === "/marketplace" && "bg-gray-100"}`}
               >
-                <svg
-                  className="flex-shrink-0 w-[24px] h-[24px] text-gray-500 transition duration-75"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 18 18"
-                >
-                  <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z" />
-                </svg>
+                <ShopWindow size={24} />
                 <span className="flex-1 ml-3 whitespace-nowrap">Marketplace</span>
+                <span className="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full">Soon</span>
+              </div>
+            </li>
+            <li>
+              <div
+                onClick={() => {
+                  navigate("/auction");
+                }}
+                className={`cursor-pointer flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100  group ${data.pathname === "/auction" && "bg-gray-100"}`}
+              >
+                <Auction size={24} />
+                <span className="flex-1 ml-3 whitespace-nowrap">Auction</span>
                 <span className="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full">Soon</span>
               </div>
             </li>
           </ul>
 
-          <div className="mx-auto flex flex-col space-y-4 w-full">
+          <div className="mx-auto flex flex-col space-y-4 w-full ">
             <div
               onClick={() => {
-                navigate("/");
+                navigate("/admin");
+              }}
+              className="cursor-pointer text-white font-bold flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100  group bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90%"
+            >
+              <AdminPanelSettings size={32} />
+              <span className="flex-1 ml-3 whitespace-nowrap">Admin</span>
+              <span className="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full"></span>
+            </div>
+            <div
+              onClick={() => {
+                openInNewTab("https://drive.google.com/drive/u/1/folders/1JaFIvgmKbh0yX6prfmSw2WmkcSt4Udbe");
               }}
               className="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100  group"
             >
@@ -210,11 +231,11 @@ const Header: React.FC<{}> = () => {
                 <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z" />
               </svg>
               <span className="flex-1 ml-3 whitespace-nowrap">Docs</span>
-              <span className="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full">Soon</span>
+              <span className="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full"></span>
             </div>
             <div
               onClick={() => {
-                navigate("/");
+                openInNewTab("https://drive.google.com/drive/u/1/folders/1JaFIvgmKbh0yX6prfmSw2WmkcSt4Udbe");
               }}
               className="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100  group"
             >
@@ -228,7 +249,7 @@ const Header: React.FC<{}> = () => {
                 <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z" />
               </svg>
               <span className="flex-1 ml-3 whitespace-nowrap">Whitepaper</span>
-              <span className="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full">Soon</span>
+              <span className="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full"></span>
             </div>
             <div className="mx-auto">
               <ConnectButton showBalance={false} />

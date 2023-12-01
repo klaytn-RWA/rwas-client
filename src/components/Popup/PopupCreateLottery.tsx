@@ -15,6 +15,7 @@ import cn from "../../services/cn";
 import { resolverError } from "../../utils/form";
 import Button from "../Button/Button";
 import Input from "../Input/Input";
+import Message from "../Message/Message";
 import Popup from "./Popup";
 import { usePopups } from "./PopupProvider";
 
@@ -189,6 +190,8 @@ const PopupCreateLottery: React.FC<{}> = () => {
   return (
     <Popup className="bg-gray-50 min-w-[800px]">
       <h1 className="mb-4 text-center font-bold text-[20px]">Select NFT to create Lottery</h1>
+      <Message className="mb-4 mx-auto" title="Lottery" content="To create a lottery you need to have NFT in your Transca admin account" />
+
       <form className="flex justify-center space-x-2">
         <div className="w-2/3 px-6 bg-white border border-none rounded-xl shadow-xl">
           <div className="py-1 flex justify-center items-center h-full">

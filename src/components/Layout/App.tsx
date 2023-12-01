@@ -9,6 +9,7 @@ import PopupProvider from "../Popup/PopupProvider";
 import Toast from "../Toast/toast";
 import Admin from "./Admin/Admin";
 import MultiSign from "./Admin/MultiSign";
+import Auction from "./Auction";
 import Borrow from "./Borrow";
 import History from "./History/History";
 import Lend from "./Lend";
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
       {
         path: "/marketplace",
         element: <Marketplace />,
+      },
+      {
+        path: "/auction",
+        element: <Auction />,
       },
       {
         path: "/nft-service",

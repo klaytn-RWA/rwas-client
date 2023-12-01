@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import { truncateSuiTx } from "../../../services/address";
 import Button from "../../Button/Button";
 import HeaderAdmin from "../../Header/HeaderAdmin";
+import Message from "../../Message/Message";
 import { AdminAddress } from "./data";
 
 const MultiSign: React.FC<{}> = () => {
@@ -23,11 +24,35 @@ const MultiSign: React.FC<{}> = () => {
   const assetRx = useAppSelector(selectAsset);
 
   useEffect(() => {
+    if (isConnected && address !== AdminAddress.audit && address !== AdminAddress.stocker && address !== AdminAddress.transca) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect admin account (multi-sign)",
+          type: "error",
+        }),
+      );
+    }
+  }, [isConnected, address, dispatch]);
+
+  useEffect(() => {
     dispatch(getRequestMint({}));
   }, [dispatch]);
   // console.log(abiTranscaAsset, abiTranscaI, abiTranscaBundle);
 
   const onSign = async (signer: any, index: number, btn: string) => {
+    if (address !== AdminAddress.transca && address !== AdminAddress.audit && address !== AdminAddress.stocker) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect admin multi-sign account",
+          type: "error",
+        }),
+      );
+      return;
+    }
     if (!isConnected && (signer !== AdminAddress.stocker || signer !== AdminAddress.audit || signer !== AdminAddress.transca)) {
       setIsLoadingAuditSign(false);
       setIsLoadingStockerSign(false);
@@ -223,7 +248,7 @@ const MultiSign: React.FC<{}> = () => {
                   className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 !rounded-xl font-bold text-white w-[150px] text-[13px] leading-[21px] !px-1 disabled:opacity-80"
                   onClick={() => onHandleMint(i)}
                   loading={isLoadingExecuteMint}
-                  // disabled={e.executed}
+                  disabled={e.executed}
                 >
                   {e.executed ? "Minted" : "Execute mint"}
                 </Button>
@@ -269,7 +294,15 @@ const MultiSign: React.FC<{}> = () => {
       <HeaderAdmin />
       <div className="p-4 md:ml-64 mt-14 bg-gray-100 h-screen">
         <div className="bg-white px-4 py-4 border border-none rounded-xl">
-          <h1 className="text-[32px] leading-24 font-bold m-4">Confirm RWAs by Multi-Sign</h1>
+          <div className="flex space-x-2">
+            <h1 className="text-[32px] leading-24 font-bold m-4">Confirm RWAs by Multi-Sign</h1>
+            <Message
+              className="mb-4 mx-auto"
+              title="Multi-Sign"
+              content="To mint NFT for the user, you need to log in to the Stocker, Audit, Transca accounts and sign one after another to confirm the right to mint NFT."
+            />
+          </div>
+
           <div className="flex flex-col space-y-4">{onShowRequest()}</div>
         </div>
       </div>

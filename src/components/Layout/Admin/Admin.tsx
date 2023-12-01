@@ -1,6 +1,6 @@
 import { Copy, Lottery } from "@styled-icons/fluentui-system-regular";
 import { waitForTransaction, writeContract } from "@wagmi/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount, useContractReads } from "wagmi";
 import lotteryAbi from "../../../abi/Lottery.json";
 import transcaAssetAbi from "../../../abi/TranscaAssetNFT.json";
@@ -11,11 +11,13 @@ import { useAppDispatch } from "../../../redux/store";
 import { truncateEthAddress, truncateSuiTx } from "../../../services/address";
 import Button from "../../Button/Button";
 import HeaderAdmin from "../../Header/HeaderAdmin";
+import Message from "../../Message/Message";
 import PopupCreateLottery from "../../Popup/PopupCreateLottery";
 import { usePopups } from "../../Popup/PopupProvider";
+import { AdminAddress } from "./data";
 
 const Admin: React.FC<{}> = () => {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const { addPopup } = usePopups();
   const [isLoadingCreateLottery, setIsLoadingCreateLottery] = useState(false);
   const [isLoadingUnPauseLottery, setIsLoadingUnpauseLottery] = useState(false);
@@ -36,14 +38,51 @@ const Admin: React.FC<{}> = () => {
 
   const dispatch = useAppDispatch();
   const onHandleCreateLottery = async () => {
+    if (address !== AdminAddress.transca) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect Transca account",
+          type: "error",
+        }),
+      );
+      return;
+    }
     return addPopup({
       Component: () => {
         return <PopupCreateLottery />;
       },
     });
   };
+
+  useEffect(() => {
+    if (isConnected && address !== AdminAddress.audit && address !== AdminAddress.stocker && address !== AdminAddress.transca) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect admin account (multi-sign)",
+          type: "error",
+        }),
+      );
+    }
+  }, [isConnected, address, dispatch]);
+
   const onHandleUnPauseLottery = async () => {
     setIsLoadingUnpauseLottery(true);
+    if (address !== AdminAddress.transca) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect Transca account",
+          type: "error",
+        }),
+      );
+      setIsLoadingUnpauseLottery(false);
+      return;
+    }
     const sign = await writeContract({
       address: import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!,
       abi: lotteryAbi,
@@ -79,6 +118,18 @@ const Admin: React.FC<{}> = () => {
   };
   const onHandleSetLotteryAsset = async () => {
     setIsLoadingSetLotteryAsset(true);
+    if (address !== AdminAddress.transca) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect Transca account",
+          type: "error",
+        }),
+      );
+      setIsLoadingSetLotteryAsset(false);
+      return;
+    }
     const sign = await writeContract({
       address: import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!,
       abi: lotteryAbi,
@@ -114,6 +165,18 @@ const Admin: React.FC<{}> = () => {
   };
   const onHandleSetLotteryToken = async () => {
     setIsLoadingSetLotteryToken(true);
+    if (address !== AdminAddress.transca) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect Transca account",
+          type: "error",
+        }),
+      );
+      setIsLoadingSetLotteryToken(false);
+      return;
+    }
     const sign = await writeContract({
       address: import.meta.env.VITE_TRANSCA_LOTTERY_CONTRACT!,
       abi: lotteryAbi,
@@ -184,6 +247,18 @@ const Admin: React.FC<{}> = () => {
   };
   const onHandleUnPauseTranscaAsset = async () => {
     setIsLoadingUnPauseTranscaAsset(true);
+    if (address !== AdminAddress.transca) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect Transca account",
+          type: "error",
+        }),
+      );
+      setIsLoadingUnPauseTranscaAsset(false);
+      return;
+    }
     const sign = await writeContract({
       address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
       abi: transcaAssetAbi,
@@ -219,6 +294,18 @@ const Admin: React.FC<{}> = () => {
   };
   const onHandleSetAggregator = async () => {
     setIsLoadingSetAggregator(true);
+    if (address !== AdminAddress.transca) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect Transca account",
+          type: "error",
+        }),
+      );
+      setIsLoadingSetAggregator(false);
+      return;
+    }
     const sign = await writeContract({
       address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
       abi: transcaAssetAbi,
@@ -255,6 +342,18 @@ const Admin: React.FC<{}> = () => {
 
   const onHandleUnPauseBundle = async () => {
     setIsLoadingUnpauseTranscaBundle(true);
+    if (address !== AdminAddress.transca) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect Transca account",
+          type: "error",
+        }),
+      );
+      setIsLoadingUnpauseTranscaBundle(false);
+      return;
+    }
     const sign = await writeContract({
       address: import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT!,
       abi: transcaBundleAbi,
@@ -290,6 +389,18 @@ const Admin: React.FC<{}> = () => {
   };
   const onHandleSetAssetBundle = async () => {
     setIsLoadingSetTranscaAssetBundle(true);
+    if (address !== AdminAddress.transca) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect Transca account",
+          type: "error",
+        }),
+      );
+      setIsLoadingSetTranscaAssetBundle(false);
+      return;
+    }
     const sign = await writeContract({
       address: import.meta.env.VITE_TRANSCA_BUNDLE_CONTRACT!,
       abi: transcaBundleAbi,
@@ -325,6 +436,18 @@ const Admin: React.FC<{}> = () => {
   };
   const onHandleUnPauseIntermediation = async () => {
     setIsLoadingUnpauseIntermediation(true);
+    if (address !== AdminAddress.transca) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect Transca account",
+          type: "error",
+        }),
+      );
+      setIsLoadingUnpauseIntermediation(false);
+      return;
+    }
     const sign = await writeContract({
       address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT!,
       abi: transcaIAbi,
@@ -360,6 +483,18 @@ const Admin: React.FC<{}> = () => {
   };
   const onHandleSetIntermediationToken = async () => {
     setIsLoadingSetIntermediationToken(true);
+    if (address !== AdminAddress.transca) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect Transca account",
+          type: "error",
+        }),
+      );
+      setIsLoadingSetIntermediationToken(false);
+      return;
+    }
     const sign = await writeContract({
       address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT!,
       abi: transcaIAbi,
@@ -395,6 +530,18 @@ const Admin: React.FC<{}> = () => {
   };
   const onHandleSetIntermediationAsset = async () => {
     setIsLoadingSetIntermediationAsset(true);
+    if (address !== AdminAddress.transca) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect Transca account",
+          type: "error",
+        }),
+      );
+      setIsLoadingSetIntermediationAsset(false);
+      return;
+    }
     const sign = await writeContract({
       address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT!,
       abi: transcaIAbi,
@@ -430,6 +577,18 @@ const Admin: React.FC<{}> = () => {
   };
   const onHandleSetIntermediationBundle = async () => {
     setIsLoadingSetIntermediationBundle(true);
+    if (address !== AdminAddress.transca) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect Transca account",
+          type: "error",
+        }),
+      );
+      setIsLoadingSetIntermediationBundle(false);
+      return;
+    }
     const sign = await writeContract({
       address: import.meta.env.VITE_TRANSCA_INTERMEDIATION_CONTRACT!,
       abi: transcaIAbi,
@@ -466,6 +625,18 @@ const Admin: React.FC<{}> = () => {
 
   const onHandleSetMultiSign = async () => {
     setIsLoadingSetMiltiSign(true);
+    if (address !== AdminAddress.transca) {
+      dispatch(
+        setToast({
+          show: true,
+          title: "",
+          message: "Please connect Transca account",
+          type: "error",
+        }),
+      );
+      setIsLoadingSetMiltiSign(false);
+      return;
+    }
     const sign = await writeContract({
       address: import.meta.env.VITE_TRANSCA_ASSET_CONTRACT!,
       abi: transcaAssetAbi,
@@ -610,6 +781,9 @@ const Admin: React.FC<{}> = () => {
       <div className="p-4 md:ml-40 mt-14 bg-gray-100 h-screen w-full">
         <div className="w-full bg-white px-4 py-4 border border-none rounded-xl flex flex-col lg:flex-row justify-between items-center space-x-4">
           <div className="w-full flex flex-col space-y-6">
+            <div className="w-full flex justify-center items-center">
+              <Message className="" title="Set" content="Here are all of Transca's contracts and their current status. You can use SET to return them to the default state" />
+            </div>
             <div className="w-full flex flex-col justify-center space-y-4 lg:flex-row lg:space-y-0 lg:space-x-4">
               <div className="">
                 <h1 className="text-32 leading-24 font-bold mx-4">

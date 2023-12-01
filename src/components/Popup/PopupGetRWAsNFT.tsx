@@ -15,6 +15,7 @@ import cn from "../../services/cn";
 import { resolverError } from "../../utils/form";
 import Button from "../Button/Button";
 import Input from "../Input/Input";
+import Message from "../Message/Message";
 import Popup from "./Popup";
 import { usePopups } from "./PopupProvider";
 type GetRWAsNFTType = {
@@ -368,9 +369,12 @@ const PopupGetRWAsNFT: React.FC<{}> = () => {
 
   return (
     <Popup className="bg-gray-50 min-w-[700px]">
-      <h1 className="mb-4 text-center font-bold text-[20px]" onClick={onOpenPopUpSipping}>
-        Get RWAs NFT by shipping asset
-      </h1>
+      <h1 className="mb-4 text-center font-bold text-[20px]">Get RWAs NFT by shipping asset</h1>
+      <Message
+        className="mb-4 mx-auto"
+        title="Get NFT"
+        content="To mint NFT RWAs, you need to ship the asset to the nearest Transca warehouse. Transca will carry out the processes from receiving goods to warehousing, pricing and minting NFTs for you. Below are a few sample images you can choose from and create a request to mint. Transca will upgrade so you can take pictures of assets yourself and upload them to create mint requests yourself."
+      />
       <form onSubmit={handleSubmit(onSubmit)} className="flex justify-center space-x-2">
         <div className="w-1/2 px-6 bg-white border border-none rounded-xl shadow-xl">
           <div className="py-1 flex justify-center items-center h-full">
